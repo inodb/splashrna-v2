@@ -11,7 +11,14 @@
   --warn: #8a5a00;
   --warn-bg: #fff6e0;
   --radius: 10px;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /* Deliberately NOT led by `system-ui`. On systems where that generic resolves to a
+     fixed-width face — which happens on minimal Linux installs — it wins over every
+     fallback after it and renders the whole page as monospace. Naming the real
+     platform UI fonts gives the same native look without that failure mode. */
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell,
+    "Helvetica Neue", Helvetica, Arial, "Liberation Sans", "DejaVu Sans", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono",
+    "Liberation Mono", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,7 +45,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 15px/1.55 var(--sans);
 }
 
 .wrap {

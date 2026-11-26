@@ -32,7 +32,11 @@ const els = {
   status: $<HTMLDivElement>("status"),
   progress: $<HTMLProgressElement>("progress"),
   results: $<HTMLElement>("results"),
+  offTargetHint: $<HTMLElement>("offTargetHint"),
 };
+
+const plural = (n: number, singular: string, plural = `${singular}s`) =>
+  `${n.toLocaleString()} ${n === 1 ? singular : plural}`;
 
 let scorer: SplashScorer | null = null;
 let loading: Promise<SplashScorer> | null = null;
@@ -165,7 +169,10 @@ function renderResults(results: DesignResult[]): void {
       result.discarded.restrictionSites +
       result.discarded.inGeneDuplicates +
       result.discarded.offTarget;
-    meta.textContent = `${result.sequenceLength.toLocaleString()} nt · ${result.guides.length} shown · ${dropped.toLocaleString()} candidates filtered`;
+    meta.textContent =
+      `${result.sequenceLength.toLocaleString()} nt · ` +
+      `${result.guides.length} shown · ` +
+      `${plural(dropped, "candidate")} filtered`;
     header.append(title, meta);
     section.append(header);
 
@@ -319,3 +326,11 @@ els.csv.addEventListener("click", () => {
 });
 
 els.fasta.value = EXAMPLE_INPUT;
+
+// Say up front whether off-target filtering is actually available on this deployment,
+// rather than claiming either way and being wrong.
+void getOffTargetIndex().then((index) => {
+  els.offTargetHint.textContent = index
+    ? "Guides with an exact match in another human or mouse gene."
+    : "Unavailable: the off-target index is not deployed on this host.";
+});

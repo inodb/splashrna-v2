@@ -2,7 +2,7 @@
   "name": "splashrna-v2",
   "version": "2.0.0",
   "private": true,
-  "description": "SplashRNA shRNA prediction — a static, dependency-free rewrite of splashrna.mskcc.org",
+  "description": "SplashRNA shRNA prediction \u2014 a static, dependency-free rewrite of splashrna.mskcc.org",
   "type": "module",
   "license": "GPL-3.0-or-later",
   "engines": {
@@ -17,13 +17,15 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src tests",
     "format": "prettier --write src tests",
-    "model": "python3 tools/build_model.py"
+    "model": "python3 tools/build_model.py",
+    "browser-check": "vite build && node tools/serve-and-check.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^8.18.1",
     "@typescript-eslint/parser": "^8.18.1",
     "eslint": "^9.17.0",
+    "playwright": "^1.49.1",
     "prettier": "^3.4.2",
     "typescript": "^5.7.2",
     "vite": "^6.0.5",

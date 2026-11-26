@@ -37,6 +37,14 @@ jobs:
       - run: npm test
       - run: npm run build
 
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Drive the built site in a real browser
+        # The optional indexes are derived data and are not committed, so the
+        # index-dependent checks report SKIP here rather than failing.
+        run: npm run browser-check
+
       - uses: actions/upload-artifact@v4
         with:
           name: site

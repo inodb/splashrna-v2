@@ -28,9 +28,15 @@ still serve in ten years.
 ```bash
 npm install
 npm run dev        # development server
-npm test           # 30 tests, including ground truth from the original server
+npm test           # 53 tests, including ground truth from the original server
 npm run build      # static site in dist/
+npm run browser-check   # drive the built site in a real browser
 ```
+
+`browser-check` builds the site, serves it on localhost and drives it with Chromium:
+it verifies the page renders, the model and indexes load over HTTP, a design run
+populates the results table, nothing throws or 404s, dark mode applies, and there is no
+horizontal overflow at phone width. Screenshots land in `$SHOT_DIR`.
 
 `dist/` can be dropped on any static host: GitHub Pages, S3, Netlify, or an
 `nginx` document root. Nothing else is required.
