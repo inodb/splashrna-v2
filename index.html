@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SplashRNA — potent shRNA prediction</title>
+    <meta
+      name="description"
+      content="Design potent miR-E shRNAs with the SplashRNA sequential classifier. Runs entirely in your browser."
+    />
+    <link rel="stylesheet" href="./src/ui/styles.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="wrap">
+        <h1>SplashRNA</h1>
+        <p class="tagline">
+          Prediction of potent shRNAs with a sequential classification algorithm.
+          Everything runs in your browser — no sequence you enter leaves this page,
+          except when you ask for a transcript by accession.
+        </p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="panel" aria-labelledby="input-heading">
+        <h2 id="input-heading">Input</h2>
+        <p class="hint">
+          One or more FASTA records. Each record may hold a nucleotide sequence, a
+          RefSeq accession (<code>NM_…</code>), or an Entrez gene ID.
+        </p>
+        <label class="sr-only" for="fasta">FASTA input</label>
+        <textarea id="fasta" rows="9" spellcheck="false" autocapitalize="off"></textarea>
+        <div class="row">
+          <button type="button" id="example" class="ghost">Load example</button>
+          <button type="button" id="clear" class="ghost">Clear</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="options-heading">
+        <h2 id="options-heading">Options</h2>
+        <div class="options">
+          <label class="field">
+            <span>Predictions per gene</span>
+            <input id="count" type="number" min="1" max="500" value="5" />
+          </label>
+
+          <label class="check">
+            <input id="removeRE" type="checkbox" checked />
+            <span>
+              Remove guides with EcoRI or XhoI sites
+              <small>Restriction sites in the 97-mer complicate cloning.</small>
+            </span>
+          </label>
+
+          <label class="check">
+            <input id="inGeneDup" type="checkbox" />
+            <span>
+              Keep guides that repeat within the transcript
+              <small>Off by default, matching the original server.</small>
+            </span>
+          </label>
+
+          <label class="check">
+            <input id="offTargetDup" type="checkbox" />
+            <span>
+              Keep guides matching other transcripts
+              <small>Requires the off-target index, which is not yet bundled.</small>
+            </span>
+          </label>
+
+          <label class="field">
+            <span>Off-target filtering</span>
+            <select id="offTargetMode">
+              <option value="top-candidates">Top candidates (fast)</option>
+              <option value="exhaustive">Exhaustive (original order)</option>
+            </select>
+            <small>
+              The original server checked every tile before truncating. Restricting the
+              check to the best candidates gives the same list far more cheaply.
+            </small>
+          </label>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button type="button" id="run" class="primary">Design shRNAs</button>
+        <button type="button" id="csv" class="ghost" disabled>Download CSV</button>
+      </div>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <progress id="progress" max="1" value="0" hidden></progress>
+
+      <section id="results" aria-live="polite"></section>
+    </main>
+
+    <footer class="wrap">
+      <p>
+        Method:
+        <a
+          href="https://doi.org/10.1038/nbt.3807"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Pelossof R, Fairchild L, et al. Prediction of potent shRNAs with a sequential
+          classification algorithm. <em>Nature Biotechnology</em> 35, 350–353 (2017)</a
+        >.
+      </p>
+      <p class="small">
+        A rewrite of the original SplashRNA server. The classifiers are the published
+        2017 models, re-expressed without their original dependencies; scores are
+        reproduced to within 10<sup>−6</sup> of the originals.
+      </p>
+    </footer>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

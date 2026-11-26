@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: npm ci
+
+      - name: Rebuild the model bundle from the committed parameters
+        run: |
+          pip install numpy
+          python3 tools/build_model.py
+
+      - name: The committed bundle must match a fresh build
+        run: git diff --exit-code public/splashrna-model.json
+
+      - name: Check that the Python reference agrees with the fixtures
+        run: python3 tools/validate.py
+
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: dist/

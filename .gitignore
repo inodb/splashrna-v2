@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.conda-node/
+*.log
+.DS_Store
+.vite/
+coverage/
+__pycache__/
+*.pyc
+.venv/
