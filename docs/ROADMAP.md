@@ -21,7 +21,7 @@ database behind an API.
 
 These originally lived only in the `dat/` directory of the legacy server's install,
 on a single internal host. They are now archived, gzipped and checksummed, in
-[inodb/splashrna-v2-data](https://github.com/inodb/splashrna-v2-data) (private, 127 MB)
+[mskcc/splashrna-v2-data](https://github.com/mskcc/splashrna-v2-data) (private, 127 MB)
 — the eight files that matter, minus the regenerable `predictions/` cache.
 
 They are deliberately *not* in this repository: the build never reads them at runtime,
