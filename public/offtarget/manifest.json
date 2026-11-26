@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "blockSize": 1024,
+  "note": "22-mers occurring in two or more genes. Built from the legacy SplashRNA match tables; keyed by assembly, correcting the swapped species labels in the original server.",
+  "genomes": {
+    "human": {
+      "assembly": "hg38",
+      "count": 1138230,
+      "blocks": 1112,
+      "keysBytes": 5156177,
+      "dirBytes": 11120,
+      "keys": "human-keys.bin",
+      "directory": "human-keys.dir"
+    },
+    "mouse": {
+      "assembly": "mm10",
+      "count": 990865,
+      "blocks": 968,
+      "keysBytes": 4540305,
+      "dirBytes": 9680,
+      "keys": "mouse-keys.bin",
+      "directory": "mouse-keys.dir"
+    }
+  }
+}

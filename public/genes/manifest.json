@@ -1,0 +1,11 @@
+{
+  "formatVersion": 1,
+  "source": "intersection_20151217_seq_updated.txt",
+  "note": "Entrez gene ID to isoform-intersection transcript. '*' marks a boundary between non-contiguous blocks; 22-mers spanning one are not valid guides.",
+  "symbols": "ACGT*N",
+  "count": 39760,
+  "blobBytes": 58141443,
+  "indexBytes": 636160,
+  "blob": "genes.bin",
+  "index": "genes.idx"
+}

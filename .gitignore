@@ -8,9 +8,3 @@ coverage/
 __pycache__/
 *.pyc
 .venv/
-
-# Derived off-target index (build with tools/build_offtarget.py)
-public/offtarget/
-
-# Derived gene index (build with tools/build_genes.py)
-public/genes/
