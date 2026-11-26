@@ -7,6 +7,11 @@ const CITATION =
 const METHODS_NOTE =
   "Please add to your methods: The shRNAs were designed using the SplashRNA algorithm (Pelossof and Fairchild et al., 2017).";
 
+/**
+ * Column names follow the original export, with one correction: the original server
+ * loaded the human table into its "mouse" variable and vice versa (server.py:662-663),
+ * so its Human and Mouse match columns were swapped. These are labelled correctly.
+ */
 const COLUMNS = [
   "Feature",
   "shRNA.name",
@@ -17,9 +22,14 @@ const COLUMNS = [
   "miRE.score",
   "97mer.construct",
   "Warnings",
-  "Human.22mer.match.genes",
-  "Mouse.22mer.match.genes",
+  "Human.22mer.match.gene.count",
+  "Mouse.22mer.match.gene.count",
 ];
+
+/** "" when no off-target index was consulted, so blank is distinct from a real zero. */
+function offTargetCell(count: number | undefined): string {
+  return count === undefined ? "" : String(count);
+}
 
 function escapeCell(value: string | number): string {
   const text = String(value);
@@ -51,8 +61,8 @@ export function toCsv(results: DesignResult[], generatedAt = new Date()): string
         guide.mirE.toFixed(6),
         guide.construct,
         [...guide.warnings, ...(i === 0 ? result.warnings : [])].join("; "),
-        guide.offTargetHuman.join(";"),
-        guide.offTargetMouse.join(";"),
+        offTargetCell(guide.offTarget?.humanGenes),
+        offTargetCell(guide.offTarget?.mouseGenes),
       ]);
     });
   }

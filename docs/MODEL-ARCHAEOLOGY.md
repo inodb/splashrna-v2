@@ -131,12 +131,39 @@ evaluations per guide into a few hundred lookups — **an 18× end-to-end speedu
 (6.2 s → 0.35 s for a 2 kb transcript) with bit-identical output, asserted by
 `tests/collapsed.test.ts`.
 
+## Step 6 — a bug found in the off-target tables
+
+While building the static off-target index, the legacy loader turned out to assign the
+two match tables to the wrong species:
+
+```python
+server.py:662   self.mouseMatch = pickle.load(open("dat/hg38_22mer_matches.pickle"))
+server.py:663   self.humanMatch = pickle.load(open("dat/mm10_22mer_matches.pickle"))
+```
+
+`hg38` is the human assembly and `mm10` the mouse one, so these are crossed. Confirmed
+by checking marker genes in each file's Entrez ID set:
+
+| File | TP53/ACTB/EGFR/KRAS (human) | Trp53/Myc/Actb/Egfr/Kras (mouse) |
+|---|---|---|
+| `hg38_22mer_matches.pickle` | present | absent |
+| `mm10_22mer_matches.pickle` | absent | present |
+
+The sets are disjoint, so this is unambiguous. **Filtering was unaffected** — a guide
+is dropped when either table matches, and swapping two tables does not change their
+union — but every species label the server reported, in the UI and in the
+`Human.22mer.match.genes` / `Mouse.22mer.match.genes` CSV columns, was wrong.
+
+`tools/build_offtarget.py` keys its output off the assembly name, so v2 labels these
+correctly. Anyone comparing v2 output against archived 2017 CSVs should expect the two
+species columns to be exchanged.
+
 ## What is not yet carried over
 
 * **Entrez gene IDs** resolve to a single RefSeq transcript. The original designed
   against the *intersection of a gene's isoforms*, using a 112 MB precomputed table.
   The UI states this difference rather than hiding it.
-* **Off-target filtering** needs the 217 MB human and mouse 22-mer match tables. The
-  interface (`OffTargetIndex`) exists and is tested; the data is not yet sharded.
+* **Gene names** for off-target hits. The index carries counts; the name lists would
+  roughly triple its size and are only needed for the handful of displayed guides.
 
 See `docs/ROADMAP.md`.

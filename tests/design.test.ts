@@ -124,7 +124,12 @@ describe("design pipeline", () => {
       async lookup(guides) {
         const map = new Map();
         for (const g of guides) {
-          map.set(g, g === first ? { human: ["SOMEGENE"], mouse: [] } : { human: [], mouse: [] });
+          map.set(
+            g,
+            g === first
+              ? { humanGenes: 3, mouseGenes: 0 }
+              : { humanGenes: 0, mouseGenes: 0 },
+          );
         }
         return map;
       },
@@ -145,7 +150,8 @@ describe("design pipeline", () => {
       index,
     );
     expect(kept.guides[0].guide).toBe(first);
-    expect(kept.guides[0].offTargetHuman).toEqual(["SOMEGENE"]);
+    expect(kept.guides[0].offTarget).toEqual({ humanGenes: 3, mouseGenes: 0 });
+    expect(kept.guides[0].warnings.join(" ")).toMatch(/3 human genes/);
   });
 
   it("exports CSV with a header, citation and one row per guide", async () => {

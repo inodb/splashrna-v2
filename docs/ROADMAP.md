@@ -1,9 +1,10 @@
 # Roadmap
 
 Phase 1 (done) is a working static site: sequence and RefSeq input, exact scoring,
-filtering, ranking, CSV export.
+ranking, CSV export.
 
-Phase 2 is about the bulk datasets the original server held in RAM. The goal is to keep
+Phase 2 (off-target filtering done; Entrez isoform intersection remaining) is about the
+bulk datasets the original server held in RAM. The goal is to keep
 the site fully static, so these become sharded assets fetched on demand rather than a
 database behind an API.
 
@@ -11,8 +12,8 @@ database behind an API.
 
 | Dataset | Size | Needed for |
 |---|---|---|
-| `hg38_22mer_matches.pickle` | 115 MB | Off-target filtering (human) |
-| `mm10_22mer_matches.pickle` | 102 MB | Off-target filtering (mouse) |
+| `hg38_22mer_matches.pickle` | 115 MB | Off-target filtering (human) — **done** |
+| `mm10_22mer_matches.pickle` | 102 MB | Off-target filtering (mouse) — **done** |
 | `intersection_*_seq_updated.txt` | 112 MB | Entrez gene IDs (isoform intersection) |
 | `CDSintersection_seq_*.txt` | 61 MB | "CDS only" option |
 | `reference_20151217.pickle` | 22 MB | Isoform coordinates for the gene diagram |
@@ -22,31 +23,38 @@ All of these live on the old host under
 `plvsplashrna1-copy/thankamv/softwares/splashrna/server/server/dat/`. They are *not* in
 this repository and must not be committed.
 
-## Off-target filtering
+## Off-target filtering — done
 
-Each table maps a 22-mer to the genes it matches. The design pipeline already takes an
-`OffTargetIndex` interface, which is implemented and tested against a stub, so only the
-data layer is missing.
+Implemented in `tools/build_offtarget.py` and `src/data/offtarget.ts`.
 
-Proposed approach — a sorted static index queried with HTTP range requests:
+The pickles are far smaller than their file size suggests: they hold only 22-mers
+occurring in two or more genes, which is exactly the set a guide must avoid.
 
-1. Sort all 22-mers, pack them 2 bits per base (6 bytes each) with a gene-list offset.
-2. Emit one sorted key file plus a payload file per genome.
-3. Ship a sparse in-memory prefix table (say every 4096th key, ~100 KB) so a lookup
-   needs one or two range requests rather than a binary search from scratch.
+| | Keys | Index |
+|---|---|---|
+| hg38 (human) | 1,138,230 | 5.16 MB |
+| mm10 (mouse) | 990,865 | 4.54 MB |
 
-Roughly 25 range requests for a default query. Both `Range` support and CORS are
-standard on static hosts.
+Blocks of 1024 keys, delta-varint encoded, each block self-contained so it can be
+fetched alone. Block directories total 21 KB and are loaded up front; a lookup is an
+in-memory binary search plus one Range request. Past a quarter of the file, the client
+downloads the whole thing instead, which is what exhaustive mode triggers.
 
-Why not shard by prefix: a 2 kb transcript produces ~2,000 tiles whose prefixes spread
-across nearly as many shards, so prefix sharding degenerates into thousands of requests.
-Range requests over one sorted file avoid that.
+Prefix sharding was rejected: a 2 kb transcript produces ~2,000 tiles whose prefixes
+spread across nearly as many shards, degenerating into thousands of requests.
 
 This is also why `offTargetMode` exists. The original filtered every tile before
 truncating to N. `"top-candidates"` ranks first and checks only the best few hundred,
 which returns the same list in almost every case; `"exhaustive"` reproduces the original
 ordering when it matters. The default is the cheap path, and it is a user-visible
 setting rather than a silent change.
+
+### Remaining: gene names
+
+The index carries a count, not the matching gene IDs. Adding them means a second file
+of uint16 gene indices (~13 MB for both genomes) plus a per-key offset, Range-requested
+only for displayed guides. Worth doing if users ask which gene a guide hits; not worth
+tripling the download otherwise.
 
 ## Entrez gene IDs
 

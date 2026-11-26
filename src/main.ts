@@ -1,6 +1,8 @@
 /** Browser entry point: wires the form to the engine. */
 
 import { fetchGeneTranscripts, fetchRefSeq } from "./data/ncbi.js";
+import { StaticOffTargetIndex } from "./data/offtarget.js";
+import type { OffTargetIndex } from "./engine/design.js";
 import {
   DEFAULT_OPTIONS,
   type DesignOptions,
@@ -34,6 +36,22 @@ const els = {
 let scorer: SplashScorer | null = null;
 let loading: Promise<SplashScorer> | null = null;
 let lastResults: DesignResult[] = [];
+
+/**
+ * The off-target index is an optional deployment. `undefined` means we have not looked
+ * yet; `null` means it is genuinely not deployed, and we stop retrying.
+ */
+let offTarget: OffTargetIndex | null | undefined;
+
+async function getOffTargetIndex(): Promise<OffTargetIndex | null> {
+  if (offTarget !== undefined) return offTarget;
+  try {
+    offTarget = await StaticOffTargetIndex.load("./offtarget");
+  } catch {
+    offTarget = null;
+  }
+  return offTarget;
+}
 
 function setStatus(message: string, isError = false): void {
   els.status.textContent = message;
@@ -141,7 +159,8 @@ function renderResults(results: DesignResult[]): void {
       const table = document.createElement("table");
       table.innerHTML =
         "<thead><tr><th>Position</th><th>Antisense guide</th><th>SplashRNA</th>" +
-        "<th>miR-30</th><th>miR-E</th><th>97-mer construct</th><th>Notes</th></tr></thead>";
+        "<th>miR-30</th><th>miR-E</th><th>Off-target</th>" +
+        "<th>97-mer construct</th><th>Notes</th></tr></thead>";
       const body = document.createElement("tbody");
 
       for (const guide of result.guides) {
@@ -161,6 +180,18 @@ function renderResults(results: DesignResult[]): void {
         add(guide.splash.toFixed(3), guide.splash >= 1 ? "score high" : "score");
         add(guide.mir30.toFixed(3), "score");
         add(guide.mirE.toFixed(3), "score");
+
+        // "—" distinguishes "index not consulted" from a genuine zero.
+        if (guide.offTarget === null) {
+          add("—");
+        } else {
+          const { humanGenes, mouseGenes } = guide.offTarget;
+          add(
+            humanGenes + mouseGenes === 0
+              ? "unique"
+              : `${humanGenes} human / ${mouseGenes} mouse`,
+          );
+        }
 
         const construct = document.createElement("td");
         const code = document.createElement("code");
@@ -201,22 +232,32 @@ async function run(): Promise<void> {
     setStatus("Loading the SplashRNA model…");
     const engine = await getScorer();
     const options = readOptions();
+
+    setStatus("Checking for the off-target index…");
+    const index = await getOffTargetIndex();
+    const missingIndex = index === null;
+
     const results: DesignResult[] = [];
 
-    for (const [index, entry] of entries.entries()) {
+    for (const [idx, entry] of entries.entries()) {
       const { label, sequence, note } = await resolveEntry(entry);
-      setStatus(`Scoring ${label} (${index + 1} of ${entries.length})…`);
+      setStatus(`Scoring ${label} (${idx + 1} of ${entries.length})…`);
 
       const result = await designGuides(
         { label, sequence },
         engine,
         options,
-        undefined,
+        index ?? undefined,
         (fraction) => {
-          els.progress.value = (index + fraction) / entries.length;
+          els.progress.value = (idx + fraction) / entries.length;
         },
       );
       if (note) result.warnings.unshift(note);
+      if (missingIndex) {
+        result.warnings.push(
+          "Off-target filtering was skipped: the index is not deployed on this host. Guides may match other human or mouse transcripts.",
+        );
+      }
       results.push(result);
       renderResults(results);
     }

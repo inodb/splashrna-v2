@@ -29,8 +29,25 @@ import {
 export type OffTargetMode = "top-candidates" | "exhaustive";
 
 export interface OffTargetHits {
-  human: string[];
-  mouse: string[];
+  /**
+   * Number of genes whose transcripts contain this 22-mer. The legacy tables only
+   * record 22-mers occurring in two or more genes, so any non-zero count means the
+   * guide is not unique.
+   */
+  humanGenes: number;
+  mouseGenes: number;
+  /**
+   * Entrez gene identifiers, when the index can supply them. The static index ships
+   * counts only; carrying the full gene lists would triple its size.
+   */
+  humanIds?: string[];
+  mouseIds?: string[];
+}
+
+export const NO_OFF_TARGET_HITS: OffTargetHits = { humanGenes: 0, mouseGenes: 0 };
+
+export function hasOffTargetHits(hits: OffTargetHits | null): boolean {
+  return hits !== null && hits.humanGenes + hits.mouseGenes > 0;
 }
 
 /** Source of genome-wide 22-mer match data. */
@@ -69,8 +86,8 @@ export interface DesignedGuide {
   splash: number;
   construct: string;
   warnings: string[];
-  offTargetHuman: string[];
-  offTargetMouse: string[];
+  /** Null when no off-target index was supplied, so "unknown" is distinct from "none". */
+  offTarget: OffTargetHits | null;
 }
 
 export interface DesignResult {
@@ -171,8 +188,7 @@ export async function designGuides(
         : []),
       ...restrictionSites(tile.guide).map((s) => `${s} site in the 97-mer construct.`),
     ],
-    offTargetHuman: [],
-    offTargetMouse: [],
+    offTarget: null,
   }));
   ranked.sort((a, b) => b.splash - a.splash);
 
@@ -184,19 +200,19 @@ export async function designGuides(
         : ranked.slice(0, Math.max(opts.offTargetCandidates, opts.predictionsPerGene));
     const hits = await offTargetIndex.lookup(pool.map((g) => g.guide));
     for (const guide of pool) {
-      const hit = hits.get(guide.guide);
-      if (hit) {
-        guide.offTargetHuman = hit.human;
-        guide.offTargetMouse = hit.mouse;
+      guide.offTarget = hits.get(guide.guide) ?? NO_OFF_TARGET_HITS;
+      if (hasOffTargetHits(guide.offTarget)) {
+        const { humanGenes, mouseGenes } = guide.offTarget;
+        const parts = [
+          humanGenes > 0 ? `${humanGenes} human gene${humanGenes === 1 ? "" : "s"}` : "",
+          mouseGenes > 0 ? `${mouseGenes} mouse gene${mouseGenes === 1 ? "" : "s"}` : "",
+        ].filter(Boolean);
+        guide.warnings.push(`Exact 22-mer match in ${parts.join(" and ")}.`);
       }
     }
     if (!opts.allowOffTargetDuplicates) {
       const before = ranked.length;
-      const poolSet = new Set(pool);
-      ranked = ranked.filter(
-        (g) =>
-          !poolSet.has(g) || g.offTargetHuman.length + g.offTargetMouse.length === 0,
-      );
+      ranked = ranked.filter((g) => !hasOffTargetHits(g.offTarget));
       discarded.offTarget = before - ranked.length;
     }
   }

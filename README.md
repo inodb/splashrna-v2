@@ -107,18 +107,39 @@ Verified against the running 2017 server:
 The residual is roughly four float32 ulps and comes from Shogun's float32 kernel cache,
 so this implementation is marginally *more* precise than the original.
 
+## Off-target filtering
+
+Guides that exactly match a second gene are filtered out, against both the human
+(hg38) and mouse (mm10) transcriptomes. This is an **optional deployment**: without it
+the site works and says so in the results; with it, filtering activates automatically.
+
+```bash
+python3 tools/build_offtarget.py /path/to/legacy/dat public/offtarget
+```
+
+That reads the legacy 22-mer match tables and produces a 9.7 MB block-structured index
+(8.2 MB gzipped). Only the 21 KB block directories are fetched up front; individual
+lookups pull a single ~4 KB block with an HTTP Range request, and a query that would
+touch most of the file downloads it in one go instead.
+
+The index is derived data and is not committed. What *is* committed is a 750-entry
+sample from the original tables, which the test suite checks the index against.
+
+> **A bug in the original, corrected here.** The 2017 server loaded the human table
+> into its `mouseMatch` variable and the mouse table into `humanMatch`
+> (`server.py:662-663`), so the Human and Mouse columns it reported were swapped.
+> Filtering was unaffected — a guide is dropped if either matches — but every species
+> label was wrong. This version keys off the assembly name.
+
 ## Not yet carried over
 
-Two features depend on bulk datasets (~800 MB) that have not yet been sharded into
-static assets. Both are honest gaps, surfaced in the UI rather than silently skipped:
+**Entrez gene IDs** currently resolve to a single RefSeq transcript. The original
+designed against the *intersection of a gene's isoforms*, using a 112 MB precomputed
+table. Results for multi-isoform genes may therefore differ, and the UI says so rather
+than hiding it.
 
-* **Entrez gene IDs** currently resolve to a single RefSeq transcript. The original
-  designed against the *intersection of a gene's isoforms*. Results for multi-isoform
-  genes may differ, and the UI says so.
-* **Off-target filtering** against the human and mouse transcriptomes. The interface
-  exists and is tested against a stub; the data is not bundled.
-
-See [docs/ROADMAP.md](docs/ROADMAP.md).
+Gene *names* for off-target hits are also not bundled — the index reports how many
+genes a guide matches, not which. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Privacy
 
