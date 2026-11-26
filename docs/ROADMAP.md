@@ -60,15 +60,21 @@ of uint16 gene indices (~13 MB for both genomes) plus a per-key offset, Range-re
 only for displayed guides. Worth doing if users ask which gene a guide hits; not worth
 tripling the download otherwise.
 
-## Entrez gene IDs — done
+## Entrez gene IDs, polyA cut and CDS-only — done
 
 Implemented in `tools/build_genes.py` and `src/data/genes.ts`. 39,760 genes packed at
 4 bits per symbol (A C G T * N) into a 58 MB blob with a 636 KB index; a gene costs one
 Range request. Verified against the 2017 server on five genes, which return identical
 results through the whole pipeline.
 
-Genomic coordinates were not carried over — only the intersection sequence and strand.
-They are needed only for the transcript diagram below.
+The index also carries each gene's polyA cut as a single prefix length, computed at
+build time by replaying `polyaCut()`, so no genomic coordinate lists need shipping.
+The CDS intersection rides along in a second blob for the CDS-only option and for the
+fallback when a polyA site cannot be resolved.
+
+Genomic coordinates themselves were not carried over — only the intersection sequence,
+the CDS, the strand and the cut. They are needed only for the transcript diagram
+below.
 
 The `predictions/` directory is a cache of the top 10 per gene under default options. It
 is not needed for correctness — the engine recomputes in well under a second — and is

@@ -1,11 +1,16 @@
 {
-  "formatVersion": 1,
+  "formatVersion": 2,
   "source": "intersection_20151217_seq_updated.txt",
-  "note": "Entrez gene ID to isoform-intersection transcript. '*' marks a boundary between non-contiguous blocks; 22-mers spanning one are not valid guides.",
+  "note": "Entrez gene ID to isoform-intersection transcript, CDS intersection and polyA cut index. '*' marks a boundary between non-contiguous blocks; 22-mers spanning one are not valid guides. apaCut is the prefix length to keep, or -1 when the cut could not be resolved.",
   "symbols": "ACGT*N",
   "count": 39760,
+  "withPolyACut": 22513,
+  "withCds": 39684,
   "blobBytes": 58141443,
-  "indexBytes": 636160,
+  "cdsBytes": 31642461,
+  "indexBytes": 1272320,
+  "recordBytes": 32,
   "blob": "genes.bin",
+  "cds": "cds.bin",
   "index": "genes.idx"
 }

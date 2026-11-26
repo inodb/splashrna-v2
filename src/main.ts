@@ -1,7 +1,12 @@
 /** Browser entry point: wires the form to the engine. */
 
 import { fetchGeneTranscripts, fetchRefSeq } from "./data/ncbi.js";
-import { StaticGeneIndex } from "./data/genes.js";
+import {
+  DEFAULT_TRANSCRIPT_OPTIONS,
+  StaticGeneIndex,
+  selectTranscript,
+  type TranscriptOptions,
+} from "./data/genes.js";
 import { StaticOffTargetIndex } from "./data/offtarget.js";
 import type { OffTargetIndex } from "./engine/design.js";
 import {
@@ -25,6 +30,8 @@ const els = {
   inGeneDup: $<HTMLInputElement>("inGeneDup"),
   offTargetDup: $<HTMLInputElement>("offTargetDup"),
   offTargetMode: $<HTMLSelectElement>("offTargetMode"),
+  polyACut: $<HTMLInputElement>("polyACut"),
+  cdsOnly: $<HTMLInputElement>("cdsOnly"),
   run: $<HTMLButtonElement>("run"),
   csv: $<HTMLButtonElement>("csv"),
   example: $<HTMLButtonElement>("example"),
@@ -86,6 +93,14 @@ function getScorer(): Promise<SplashScorer> {
   return loading;
 }
 
+function readTranscriptOptions(): TranscriptOptions {
+  return {
+    ...DEFAULT_TRANSCRIPT_OPTIONS,
+    polyACut: els.polyACut.checked,
+    cdsOnly: els.cdsOnly.checked,
+  };
+}
+
 function readOptions(): DesignOptions {
   const count = Number.parseInt(els.count.value, 10);
   return {
@@ -119,9 +134,13 @@ async function resolveEntry(
         setStatus(`Loading the isoform intersection for Entrez gene ${entry.value}…`);
         const intersection = await genes.get(Number.parseInt(entry.value, 10));
         if (intersection) {
+          // polyA trimming and CDS-only apply to gene IDs, where the intersection and
+          // CDS tables exist. A pasted sequence or a RefSeq accession has neither.
+          const choice = selectTranscript(intersection, readTranscriptOptions());
           return {
             label: `${entry.label} (Entrez ${entry.value})`,
-            sequence: intersection.sequence,
+            sequence: choice.sequence,
+            note: choice.warnings[0],
           };
         }
       }

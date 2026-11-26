@@ -161,7 +161,8 @@ python3 tools/build_genes.py /path/to/legacy/dat public/genes
 
 Same source archive as above: [mskcc/splashrna-v2-data](https://github.com/mskcc/splashrna-v2-data).
 
-39,760 genes packed 4 bits per symbol into a 58 MB blob, with a 636 KB index. Only the
+39,760 genes packed 4 bits per symbol into a 58 MB transcript blob and a 32 MB CDS
+blob, with a 1.27 MB index that also carries each gene's polyA cut point. Only the
 index is downloaded; a gene costs one Range request of a few kilobytes, so the blob's
 size costs the user nothing.
 
@@ -172,11 +173,33 @@ says so. With it, gene IDs behave exactly as they did in 2017.
 spanning one are skipped and positions are reported in `*`-free coordinates, matching
 `entrezID_prepare()` in the original.
 
+## The polyA cut and CDS-only
+
+The original trimmed each transcript at its annotated polyadenylation site before
+designing — and had that **on by default** — so it never proposed guides against 3'
+sequence absent from the mature mRNA. Both that and the CDS-only option are
+implemented, with the same defaults and the same fallbacks.
+
+When no polyA annotation resolves (17,247 of 39,760 genes) the original substituted
+the CDS intersection, or the untrimmed transcript when there was no CDS either. That
+behaviour and its wording are reproduced exactly.
+
+This matters: for Entrez gene 10 the polyA path shares only 6 of its top 10 guides with
+the untrimmed path. Verified against the 2017 server across 8 genes, at both n=15
+(which forces the real computation) and n=10 (which goes through the server's
+precomputed cache).
+
+Both options apply to Entrez gene IDs, where the intersection and CDS tables exist. A
+pasted sequence or a RefSeq accession has neither.
+
 ## Not yet carried over
 
-Gene *names* for off-target hits. The index reports how many genes a guide matches, not
-which; carrying the name lists would roughly triple its size. See
-[docs/ROADMAP.md](docs/ROADMAP.md).
+* Gene *names* for off-target hits. The index reports how many genes a guide matches,
+  not which; carrying the name lists would roughly triple its size.
+* The transcript diagram the original drew, and its `/help`, `/contact` and `/cite`
+  pages.
+
+See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Privacy
 

@@ -62,6 +62,25 @@
           </label>
 
           <label class="check">
+            <input id="polyACut" type="checkbox" checked />
+            <span>
+              Cut at the polyadenylation site
+              <small>
+                Skips 3′ sequence absent from the mature mRNA. On by default, as in the
+                original server. Gene IDs only.
+              </small>
+            </span>
+          </label>
+
+          <label class="check">
+            <input id="cdsOnly" type="checkbox" />
+            <span>
+              Design against the coding sequence only
+              <small>Restricts to the CDS intersection. Gene IDs only.</small>
+            </span>
+          </label>
+
+          <label class="check">
             <input id="offTargetDup" type="checkbox" />
             <span>
               Keep guides matching other transcripts
