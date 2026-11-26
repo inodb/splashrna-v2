@@ -217,14 +217,15 @@ The original blocked results until the user ticked "I am a non-profit, academic 
 and supplied an email address, which it then recorded — 104,281 entries from about
 3,800 unique addresses over the service's life.
 
-The attestation is reproduced here. **The record is not**, and cannot be: a static site
-has nowhere to write one. Neither version verified anything — any string matching
+The attestation is reproduced here. **The record is not**, and cannot be without
+somewhere to write it. Neither version verified anything — any string matching
 `[^@]+@[^@]+\.[^@]+` passed — so this was always an attestation rather than
 enforcement, but the original at least kept evidence that someone made it.
 
-If MSK needs that record for licensing, this needs a form endpoint or a small service,
-which is the one thing here that cannot be done statically. Whether the gate is
-required at all is a licensing question, not a technical one.
+The interface does not claim otherwise in either direction: it states the licensing
+terms and does not describe what happens to the address. If the record matters for
+licensing, wire the form to an endpoint (see `submitAttestation` in `src/main.ts`) —
+that is a few lines, and then the claim is simply true.
 
 The collected addresses stay on the legacy host. They are not archived and not in
 either repository.

@@ -65,6 +65,29 @@ function gateSatisfied(): boolean {
   return els.academic.checked && EMAIL_PATTERN.test(els.email.value.trim());
 }
 
+/**
+ * Where to POST the attestation, if anywhere.
+ *
+ * Empty by default: this deployment keeps no record, and the interface makes no claim
+ * that it does. Point this at an endpoint — a form service, a small function, anything
+ * that accepts JSON — and the attestation becomes an actual record. That is the only
+ * part of SplashRNA that needs something other than static files.
+ */
+const ATTESTATION_ENDPOINT = "";
+
+async function submitAttestation(email: string): Promise<void> {
+  if (!ATTESTATION_ENDPOINT) return;
+  try {
+    await fetch(ATTESTATION_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, at: new Date().toISOString() }),
+    });
+  } catch {
+    // Never block a design run on this.
+  }
+}
+
 /** Remember the attestation locally so it is not retyped on every visit. */
 function rememberGate(): void {
   try {
@@ -393,6 +416,7 @@ async function run(): Promise<void> {
     return;
   }
   rememberGate();
+  void submitAttestation(els.email.value.trim());
 
   const entries = parseFasta(els.fasta.value);
   if (entries.length === 0) {
