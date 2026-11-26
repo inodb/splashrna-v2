@@ -25,10 +25,15 @@ jobs:
       - name: Rebuild the model bundle from the committed parameters
         run: |
           pip install numpy
-          python3 tools/build_model.py
+          python3 tools/build_model.py /tmp/fresh-model.json
 
       - name: The committed bundle must match a fresh build
-        run: git diff --exit-code public/splashrna-model.json
+        # Deliberately not a byte comparison. The bundle's floats come out of NumPy,
+        # and different NumPy/BLAS builds differ in the last bit or two of a dot
+        # product -- measured at 1.9e-13 between 1.26.4 and 2.5.5, which is six orders
+        # of magnitude below our agreement with the original Shogun models. What has
+        # to hold is that the two are the same model numerically.
+        run: python3 tools/compare_model.py public/splashrna-model.json /tmp/fresh-model.json
 
       - name: Check that the Python reference agrees with the fixtures
         run: python3 tools/validate.py

@@ -39,7 +39,7 @@ from reference import (  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RAW = ROOT / "models" / "raw"
-OUT = ROOT / "public" / "splashrna-model.json"
+DEFAULT_OUT = ROOT / "public" / "splashrna-model.json"
 
 
 def load_raw(name: str) -> SplashSVM:
@@ -74,7 +74,8 @@ def pack(model: SplashSVM) -> dict:
     }
 
 
-def main() -> None:
+def main(out: pathlib.Path | None = None) -> None:
+    out = out or (pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_OUT)
     bundle = {
         "formatVersion": 1,
         "source": "Shogun 2.1.0 SVMLight models from splashrna.mskcc.org (2017)",
@@ -99,9 +100,9 @@ def main() -> None:
         bundle["models"][name] = pack(model)
         print(f"{name}: {len(model.sv_strings)} SVs, bias {model.bias:.12f}")
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(bundle, separators=(",", ":")))
-    print(f"wrote {OUT} ({OUT.stat().st_size / 1024:.0f} KB)")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(bundle, separators=(",", ":")))
+    print(f"wrote {out} ({out.stat().st_size / 1024:.0f} KB)")
 
 
 if __name__ == "__main__":
