@@ -100,6 +100,10 @@ Yes, and the tests enforce it on every push rather than taking my word for it.
 The residual is about four float32 ulps and comes from Shogun's float32 kernel cache,
 so this implementation is marginally *more* precise than the one it replaces.
 
+Full detail, including how the sample was chosen and what each side costs to run,
+is in **[docs/BENCHMARK.md](docs/BENCHMARK.md)** — a stratified sweep of 900
+captured responses covering 7,975 guides, all of which agree.
+
 The last row matters most. While the 2017 server was still running it was queried for
 genes 1, 10, 207, 672 (BRCA2), 4609 (MYC), 5728 (PTEN), 7157 (TP53) and 71458 — with
 the polyA cut on and off, and with CDS-only — and the complete pipeline returns the
