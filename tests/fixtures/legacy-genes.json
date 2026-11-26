@@ -1,0 +1,86 @@
+{
+ "note": "Output of the 2017 CherryPy server, captured from the live legacy instance before it was retired. Options: 10 predictions, apa off, cdsOnly off, removeRE off, inGeneDup off, outGeneDup off -- plain tiling of the isoform intersection with off-target filtering applied over every tile.",
+ "options": {
+  "predictionsPerGene": 10,
+  "removeRestrictionSites": false,
+  "allowInGeneDuplicates": false,
+  "allowOffTargetDuplicates": false
+ },
+ "cases": [
+  {
+   "entrezId": 71458,
+   "guides": [
+    "TTGAATTTATATTACATACCAC",
+    "TTAGTTTTCAATATTTTACAGA",
+    "TCTTATTGACAATAAGTCTCCG",
+    "TTAAACATATAAACAATCCGGT",
+    "TTTCTTTACAGAAATTGTTGTA",
+    "TTTATATTACATACCACTGGAT",
+    "TTACAATTAGTTGTTGTGTGTG",
+    "TTCATATGTAATAGTGTCCTTT",
+    "TTTGAATTTATATTACATACCA",
+    "ATTTATATTACATACCACTGGA"
+   ]
+  },
+  {
+   "entrezId": 1,
+   "guides": [
+    "TTCACATTTATTAATTCCTGGG",
+    "TCACATTTATTAATTCCTGGGA",
+    "TTTGGTTGTCATGCAGCCGGTA",
+    "TTCAGGTGAAAGAAGATGCGAT",
+    "TTCTTGAACAGCTGGAAGTCTG",
+    "TTGAACAGCTGGAAGTCTGGAG",
+    "TATGGCTGCTTCTGTCACTGGG",
+    "TTAAACAGAGCCTCTCTTCACA",
+    "TTGGTTGTCATGCAGCCGGTAG",
+    "TGAAAGAAGATGCGATCTGGGC"
+   ]
+  },
+  {
+   "entrezId": 10,
+   "guides": [
+    "TTAATTTGAAAATGTGTCCTTA",
+    "TATAATTGAATTTTCTATAGGT",
+    "TTTGTTTGTAATATACTGCTCT",
+    "TTGAATTTTCTATAGGTGAGGA",
+    "TTTATTAATTTGAAAATGTGTC",
+    "TTATAATTGAATTTTCTATAGG",
+    "TAAAAATTTACTATGAATTCAA",
+    "TTTTCTAGCATGAATCACTCTG",
+    "TACAGAAGTTGATTGACCTGGA",
+    "TTATAAATGAAGATGTTGGAGA"
+   ]
+  },
+  {
+   "entrezId": 7157,
+   "guides": [
+    "TTAAAATCTAAGCTGGTATGTC",
+    "TTATTGTAAAATAAGAGATCGA",
+    "TATTGTAAAATAAGAGATCGAT",
+    "TTTATTGTAAAATAAGAGATCG",
+    "TTACACATGTAGTTGTAGTGGA",
+    "TTTTATTGTAAAATAAGAGATC",
+    "TATACAAGAGATGAAATCCTCC",
+    "TACATTATTTCATTAACCCTCA",
+    "TTAACTGCAAGAACATTTCTTA",
+    "TTAGAGAAAATTCAACAGTGAG"
+   ]
+  },
+  {
+   "entrezId": 672,
+   "guides": [
+    "TTCAGTATTTGTTACATCCGTC",
+    "TTTCATAACAACATGAGTAGTC",
+    "TTTCATTTCTAATACCTGCCTC",
+    "TTTCTATTCTGAAGACTCCCAG",
+    "TAGATATGAAATATTCATGCCA",
+    "TTTACTGGTAGAACTATCTGCA",
+    "TTTAGAGAAGTAAACTTAGGGA",
+    "TTAAGTCACATAATCGATCCCA",
+    "TACATAAAATATTTAGTAGCCA",
+    "TAATGAATCAGCATCTTGCTCA"
+   ]
+  }
+ ]
+}

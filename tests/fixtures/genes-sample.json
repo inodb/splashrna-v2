@@ -1,0 +1,259 @@
+{
+ "note": "Verifies the packed gene index against the legacy intersection table.",
+ "genes": [
+  {
+   "entrezId": 71458,
+   "strand": "-",
+   "length": 6063,
+   "sha256": "cbe3562d66913db0ef4058d2ea361f0534a6e698c3aad37728f0523af3dfb5d6",
+   "head": "ACTAGACGCTTGAAGCCAAGCTGCCATCCAAGGGGCGACA",
+   "tail": "TTTTCTTAAAAGGCAATAAACCTGTTGAGGAAAGGAGCAA",
+   "stars": 12,
+   "ns": 0
+  },
+  {
+   "entrezId": 73047,
+   "strand": "-",
+   "length": 1285,
+   "sha256": "bdd7036a063d520420f2c56ae97b7729af6decc54128177b8082393f30659918",
+   "head": "GGCTCCCCTGCTGAGCTAGGGCCGGTCCGGCAGCTAGCCT",
+   "tail": "GGAGTGTGTGAATAAACACAGACCTCCGTGTGTGAGTGTG",
+   "stars": 3,
+   "ns": 1
+  },
+  {
+   "entrezId": 57708,
+   "strand": "+",
+   "length": 25,
+   "sha256": "6c2d9b630db667dd113ff0889871db46b8297151e4c82f287f45bfc3b5b1c370",
+   "head": "CCATCTGTTGAATCTTCAAGTCCAG",
+   "tail": "CCATCTGTTGAATCTTCAAGTCCAG",
+   "stars": 0,
+   "ns": 0
+  },
+  {
+   "entrezId": 22138,
+   "strand": "-",
+   "length": 79475,
+   "sha256": "dbd8e2f5010167dd16f45906a91286a50dc4514b72f85c6e8c22987e986908ce",
+   "head": "GAGCAGTCGCGCATTCCCACCTCGCCTCGGGTGTAGGGAT",
+   "tail": "CTTGAGATTAAAAAAAAATAAAGCAAGCTATCTGCACCTC",
+   "stars": 190,
+   "ns": 0
+  },
+  {
+   "entrezId": 1,
+   "strand": "-",
+   "length": 1775,
+   "sha256": "92fbea1a8046a42d5098d4ec4ccdace5b7a66b256d8788163a9ff364b01c7d04",
+   "head": "GGGCCTCATTGCTGCAGACGCTCACCCCAGACACTCACTG",
+   "tail": "GACTCCCAGGGCTGAGTGGGCTGGGATCTCGTGTCCTCAA",
+   "stars": 9,
+   "ns": 0
+  },
+  {
+   "entrezId": 113179,
+   "strand": "+",
+   "length": 1629,
+   "sha256": "4855e54283f452f4caafbc411fe24f4418d76893bd70475f18e54afd72d09b1c",
+   "head": "GAGGTGGGTTGGGCCGGGCCGGTTGCTAAGACTTGGCGAA",
+   "tail": "GGAAACTGCTCTGATGGGAAAATAAACAGCCCAAAACCAA",
+   "stars": 3,
+   "ns": 0
+  },
+  {
+   "entrezId": 12942,
+   "strand": "+",
+   "length": 5258,
+   "sha256": "25a75015fa4fe43fe88d8b9a333927d1bde533feaa5a79697fcbf4fb1796a624",
+   "head": "ATGTTAAGTTTTCAGAGAAGGGGATCCTGCACTCTGCCAC",
+   "tail": "TATTTCCTCTGTTCTTGCTAATAAATGGAAATGGTGGTGT",
+   "stars": 4,
+   "ns": 0
+  },
+  {
+   "entrezId": 2805,
+   "strand": "-",
+   "length": 2137,
+   "sha256": "dfd218b9feaa7661bed17f95effb7284adc255122123c642956b09e7c90a0093",
+   "head": "GCGTTCCTTCTCCCCTGTGCCTTCGTCGTCAGAAGCTGGC",
+   "tail": "TACTTCACCTAAAAAAATAAAATAAAAATGTTGATCAAGA",
+   "stars": 10,
+   "ns": 0
+  },
+  {
+   "entrezId": 85465,
+   "strand": "+",
+   "length": 8140,
+   "sha256": "d3db02f34c5482a29d41a6878cb1fd9d22ff0762f8f0ea7f44583de973d0d2fc",
+   "head": "ACGCGTGCGCGGTGGGCGGAGCGCGGCTCTCCTACCTTCT",
+   "tail": "TAAAAGTAAAAGAGTAATTTTTAAATCCTTTTAATTGTTT",
+   "stars": 11,
+   "ns": 0
+  },
+  {
+   "entrezId": 83639,
+   "strand": "+",
+   "length": 1011,
+   "sha256": "0975cc4e2d4df42b4b15cfec7447bf3597f8c3455581a0d1565aee5c21f0f93b",
+   "head": "ATCCAGACCAGCTCCTCCCAGACCTCTCCAGAAGAAGCCA",
+   "tail": "CTAATAAACATTTCTGCTGTGATTTGTGTATGTTTCAACA",
+   "stars": 4,
+   "ns": 0
+  },
+  {
+   "entrezId": 69347,
+   "strand": "-",
+   "length": 793,
+   "sha256": "7b86cf204350f0bab21cec4b1d3a992d10e0f66706e4ab06de21410b8557c7a1",
+   "head": "AGTTGCTAGCTGATATCGGTGGCGTAACATCTTTGAGGGG",
+   "tail": "TATTGAATAAACAAAGTAAACAGTGTTCACAGAAATCAAT",
+   "stars": 5,
+   "ns": 0
+  },
+  {
+   "entrezId": 57396,
+   "strand": "-",
+   "length": 2520,
+   "sha256": "2e0a0c9200254fae4d68dd4d27a378a30d5420a0d776ea3d4ead5ea5995d82d1",
+   "head": "GGCGACGGCGCTGCCGCCATTTTGTGGGGTGTTTGTCGCA",
+   "tail": "CAGAATTTAATTGATTGGTTACATAAACTTTTTGACTTCA",
+   "stars": 13,
+   "ns": 0
+  },
+  {
+   "entrezId": 20917,
+   "strand": "-",
+   "length": 3425,
+   "sha256": "96cb9a883e03c62f22b6c5706ec826b8215cf23ab66df61815d46ad7a5e1a83e",
+   "head": "TGGGCCCGGGCGGGCTCCCTCCTCCGCCCCCTCCCTCCCC",
+   "tail": "CTGTAACTATATAAAAATATTAAAATAGTTACCTTTCAGT",
+   "stars": 12,
+   "ns": 0
+  },
+  {
+   "entrezId": 258565,
+   "strand": "+",
+   "length": 945,
+   "sha256": "32dd6939826f271ff4b94094d0fc8c07be13c2679750ba98476d3a3d6316deb7",
+   "head": "ATGGCGGATGAGAACTATACAAGGATCACAGAATTCATTT",
+   "tail": "CAGGACAGTTGCTAAAGCCAAAGTTTTCCTCAAAAATTAA",
+   "stars": 0,
+   "ns": 0
+  },
+  {
+   "entrezId": 237465,
+   "strand": "+",
+   "length": 3672,
+   "sha256": "13020bfb622ab55db1a157ea35f58ce2e36e1e79cced6e3cd05b72b10107a7d1",
+   "head": "GTGTTCGGTTGGCCAGATCGGCGCTTGGGCCTGGTAGTAA",
+   "tail": "GGGTATAGAACTCATGGATAATAAAGCTCGTTTCAAAGTT",
+   "stars": 17,
+   "ns": 0
+  },
+  {
+   "entrezId": 2254,
+   "strand": "+",
+   "length": 4534,
+   "sha256": "9dc79166013f421fab93e3f1899fb33294dde8c069b7d0f15ae07275d041c6ce",
+   "head": "ACTCTGCGCGCCGGCGGGGGCTGCGCAGGAGGAGCGCTCC",
+   "tail": "TAATTTGTGTAAATACATAATTACAGAGTTTTGAAAACTG",
+   "stars": 4,
+   "ns": 0
+  },
+  {
+   "entrezId": 218850,
+   "strand": "+",
+   "length": 7325,
+   "sha256": "82e7486e1d96b771aa2943a869700c5a9fedc866d33d1f157bce66ca97362a79",
+   "head": "GGCCGGTTGAAAAGCCGCCCGAATCCGGAGCAGCTCCCGG",
+   "tail": "TATGTACATATTTTTAAATAAAAGTTGTCTTAATATGCAA",
+   "stars": 23,
+   "ns": 0
+  },
+  {
+   "entrezId": 16950,
+   "strand": "+",
+   "length": 4064,
+   "sha256": "0499a2b53280ba598d1a5e6628316e1ee6b7021bda866718110ddd51b3400848",
+   "head": "AGTCCTGAAAGTAATCTCCAGGACCAGGACTCTGCTTCCA",
+   "tail": "TGGTTCCAAACCAGGAATCTGTAATAAAAGAGGACAAATG",
+   "stars": 15,
+   "ns": 0
+  },
+  {
+   "entrezId": 16699,
+   "strand": "-",
+   "length": 887,
+   "sha256": "63d43912fb76328917acb1e82036b73962a5558924c1b032eb009b445088ecb6",
+   "head": "TTAACATCCAACCCTCAGCCTCCTCTCAAC*ATGGTCTAC",
+   "tail": "AAGTAATTTTTTCTCAATAAACTCTTGTTTCTGTTGCAAA",
+   "stars": 2,
+   "ns": 0
+  },
+  {
+   "entrezId": 436003,
+   "strand": "-",
+   "length": 563,
+   "sha256": "6873155e5573d141849946eff7375a10310394ac35acc0015378b86a0aff5792",
+   "head": "GTCTGGGCTGGGCATAAAGGGAAGAGCAGGGCCCGCTGTG",
+   "tail": "GCTTACAAGTATTACTGA*GACCCCTTCTTTCGCATGGTC",
+   "stars": 4,
+   "ns": 0
+  },
+  {
+   "entrezId": 225608,
+   "strand": "+",
+   "length": 4558,
+   "sha256": "4ebffc2f52dd9ed1c8b2eb3fa17e373d2f284e80f3f3e04902c94c5754b5600c",
+   "head": "GGCGCTCCCAGGGGCCTTGGCCCAGGGAGGATGGTGCACA",
+   "tail": "AATACTGTATATTATTAAATATTGGCTATTTACATTAATA",
+   "stars": 18,
+   "ns": 0
+  },
+  {
+   "entrezId": 11609,
+   "strand": "+",
+   "length": 2876,
+   "sha256": "d1d040de430e910563c2ba9c3ac56543af32fab43f93f04f3fd240bec16a85c6",
+   "head": "GCAGTTACATCTCAGAGGCTGGCGATGGAGGGAGCTCGGA",
+   "tail": "CAAAATCTCGTAAAAATAAAATCATTACTGGGAGACCATG",
+   "stars": 4,
+   "ns": 0
+  },
+  {
+   "entrezId": 2664,
+   "strand": "+",
+   "length": 2493,
+   "sha256": "6e46a71154a27010040b5149b55b20c749dcd8457fb0cb6ba17ec970a4904c2a",
+   "head": "ATTCTTCCTGGGCCGCAGCACCGGCCGCCGGCCCGCCCCG",
+   "tail": "CAGAAAACAAAACCTCCCAATAAAACGGTTGAAACCTGAA",
+   "stars": 12,
+   "ns": 0
+  },
+  {
+   "entrezId": 12412,
+   "strand": "+",
+   "length": 1281,
+   "sha256": "69b4ccfea8fbd289dd76e5965aa6bfe43f941ab7204c412ea1d734f8868ebb9f",
+   "head": "CAGTGCAGGCGGCGGGCCGCGCAGAGTGAGAGGCTCTTTT",
+   "tail": "TTGAGGAATTGGCATTATGTATTAAACACTCAGTTGGATG",
+   "stars": 7,
+   "ns": 0
+  },
+  {
+   "entrezId": 252909,
+   "strand": "-",
+   "length": 927,
+   "sha256": "ec30cd688388c82240bc23b673ddff9307fcac63565caf287b8139b2d26869c3",
+   "head": "ATGTTGTTTCCAAGCAACACTATCTTGGGGGTTTTCGTCA",
+   "tail": "TTTCTTCCCTTCCTATATTCAAAGAGCCATTGGTGACTGA",
+   "stars": 0,
+   "ns": 0
+  }
+ ],
+ "absent": [
+  999999991,
+  999999992
+ ]
+}

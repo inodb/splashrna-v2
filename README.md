@@ -103,9 +103,17 @@ Verified against the running 2017 server:
 | 44 guides, both classifiers | max error 3.3 × 10⁻⁷ |
 | Every tile of a real transcript (1,979 guides) | max error 3.1 × 10⁻⁷ |
 | Top 5 / 10 / 25 / 100 ranking | identical, including order |
+| **Full pipeline, 5 genes by Entrez ID** | **identical ten shRNAs, in order** |
 
 The residual is roughly four float32 ulps and comes from Shogun's float32 kernel cache,
 so this implementation is marginally *more* precise than the original.
+
+The last row is the one that matters most. While the 2017 server was still running, it
+was queried for genes 1, 10, 672 (BRCA2), 7157 (TP53) and 71458, and the complete
+pipeline — isoform intersection, tiling across block boundaries, scoring, in-gene
+de-duplication, off-target filtering, ranking — returns exactly the same ten shRNAs in
+exactly the same order for all five. Those responses are committed as fixtures
+(`tests/fixtures/legacy-genes.json`), so the parity test survives the old server.
 
 ## Off-target filtering
 
@@ -131,15 +139,32 @@ sample from the original tables, which the test suite checks the index against.
 > Filtering was unaffected — a guide is dropped if either matches — but every species
 > label was wrong. This version keys off the assembly name.
 
+## Gene IDs and the isoform intersection
+
+The original designed against the *intersection* of a gene's RefSeq isoforms — the
+stretch common to all of them — not any single transcript. That table is also available
+as a static index:
+
+```bash
+python3 tools/build_genes.py /path/to/legacy/dat public/genes
+```
+
+39,760 genes packed 4 bits per symbol into a 58 MB blob, with a 636 KB index. Only the
+index is downloaded; a gene costs one Range request of a few kilobytes, so the blob's
+size costs the user nothing.
+
+Without it, Entrez IDs fall back to a single RefSeq transcript from NCBI and the UI
+says so. With it, gene IDs behave exactly as they did in 2017.
+
+`*` in an intersection sequence marks a break between non-contiguous blocks. Windows
+spanning one are skipped and positions are reported in `*`-free coordinates, matching
+`entrezID_prepare()` in the original.
+
 ## Not yet carried over
 
-**Entrez gene IDs** currently resolve to a single RefSeq transcript. The original
-designed against the *intersection of a gene's isoforms*, using a 112 MB precomputed
-table. Results for multi-isoform genes may therefore differ, and the UI says so rather
-than hiding it.
-
-Gene *names* for off-target hits are also not bundled — the index reports how many
-genes a guide matches, not which. See [docs/ROADMAP.md](docs/ROADMAP.md).
+Gene *names* for off-target hits. The index reports how many genes a guide matches, not
+which; carrying the name lists would roughly triple its size. See
+[docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Privacy
 

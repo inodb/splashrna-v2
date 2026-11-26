@@ -1,6 +1,7 @@
 /** Browser entry point: wires the form to the engine. */
 
 import { fetchGeneTranscripts, fetchRefSeq } from "./data/ncbi.js";
+import { StaticGeneIndex } from "./data/genes.js";
 import { StaticOffTargetIndex } from "./data/offtarget.js";
 import type { OffTargetIndex } from "./engine/design.js";
 import {
@@ -53,6 +54,19 @@ async function getOffTargetIndex(): Promise<OffTargetIndex | null> {
   return offTarget;
 }
 
+/** Likewise optional: without it, Entrez IDs fall back to a single RefSeq transcript. */
+let geneIndex: StaticGeneIndex | null | undefined;
+
+async function getGeneIndex(): Promise<StaticGeneIndex | null> {
+  if (geneIndex !== undefined) return geneIndex;
+  try {
+    geneIndex = await StaticGeneIndex.load("./genes");
+  } catch {
+    geneIndex = null;
+  }
+  return geneIndex;
+}
+
 function setStatus(message: string, isError = false): void {
   els.status.textContent = message;
   els.status.classList.toggle("error", isError);
@@ -95,6 +109,20 @@ async function resolveEntry(
     }
 
     case "entrez": {
+      // Preferred path: the isoform intersection, as the original server used.
+      const genes = await getGeneIndex();
+      if (genes) {
+        setStatus(`Loading the isoform intersection for Entrez gene ${entry.value}…`);
+        const intersection = await genes.get(Number.parseInt(entry.value, 10));
+        if (intersection) {
+          return {
+            label: `${entry.label} (Entrez ${entry.value})`,
+            sequence: intersection.sequence,
+          };
+        }
+      }
+
+      // Fallback: a single RefSeq transcript, which is not the same thing.
       setStatus(`Looking up Entrez gene ${entry.value}…`);
       const gene = await fetchGeneTranscripts(entry.value);
       if (gene.accessions.length === 0) {
@@ -105,10 +133,11 @@ async function resolveEntry(
       return {
         label: `${entry.label} — ${gene.symbol} (${accession})`,
         sequence: record.sequence,
-        note:
+        note: `The isoform-intersection index is not deployed on this host, so ${accession} was used${
           gene.accessions.length > 1
-            ? `${gene.symbol} has ${gene.accessions.length} RefSeq transcripts; ${accession} was used. The original server designed against the intersection of all isoforms, so results for this gene may differ.`
-            : undefined,
+            ? ` (${gene.symbol} has ${gene.accessions.length} RefSeq transcripts)`
+            : ""
+        }. The original server designed against the intersection of all isoforms, so results may differ.`,
       };
     }
 

@@ -48,19 +48,35 @@ export interface Tile {
   position: number;
 }
 
+/** Marks a boundary between non-contiguous blocks of an isoform intersection. */
+export const BLOCK_BOUNDARY = "*";
+
 /**
  * Tile a transcript into overlapping antisense 22-mers.
  *
  * Matches the original server's behaviour: it walks every start position and takes the
  * reverse complement, so the guide strand is what gets scored.
+ *
+ * Isoform-intersection sequences contain `*` where the intersection is interrupted. A
+ * window spanning one is not a real contiguous 22-mer, so it is skipped, and positions
+ * are reported in the `*`-free coordinate system — both exactly as `entrezID_prepare()`
+ * did in the original server. A plain sequence has no `*` and is unaffected.
  */
 export function tileTranscript(sequence: string): Tile[] {
   const seq = sequence.toUpperCase().replace(/\s/g, "");
   const tiles: Tile[] = [];
+  let boundariesBefore = 0;
+
   for (let i = 0; i + SEQUENCE_LENGTH <= seq.length; i++) {
+    if (seq[i] === BLOCK_BOUNDARY) {
+      boundariesBefore++;
+      continue;
+    }
+    const window = seq.slice(i, i + SEQUENCE_LENGTH);
+    if (window.includes(BLOCK_BOUNDARY)) continue;
     tiles.push({
-      guide: reverseComplement(seq.slice(i, i + SEQUENCE_LENGTH)),
-      position: i + 1,
+      guide: reverseComplement(window),
+      position: i + 1 - boundariesBefore,
     });
   }
   return tiles;

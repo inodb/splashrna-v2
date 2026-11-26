@@ -3,8 +3,8 @@
 Phase 1 (done) is a working static site: sequence and RefSeq input, exact scoring,
 ranking, CSV export.
 
-Phase 2 (off-target filtering done; Entrez isoform intersection remaining) is about the
-bulk datasets the original server held in RAM. The goal is to keep
+Phase 2 (done) covered the bulk datasets the original server held in RAM: off-target
+filtering and the isoform intersection are both static indexes now. The goal is to keep
 the site fully static, so these become sharded assets fetched on demand rather than a
 database behind an API.
 
@@ -14,7 +14,7 @@ database behind an API.
 |---|---|---|
 | `hg38_22mer_matches.pickle` | 115 MB | Off-target filtering (human) — **done** |
 | `mm10_22mer_matches.pickle` | 102 MB | Off-target filtering (mouse) — **done** |
-| `intersection_*_seq_updated.txt` | 112 MB | Entrez gene IDs (isoform intersection) |
+| `intersection_*_seq_updated.txt` | 112 MB | Entrez gene IDs (isoform intersection) — **done** |
 | `CDSintersection_seq_*.txt` | 61 MB | "CDS only" option |
 | `reference_20151217.pickle` | 22 MB | Isoform coordinates for the gene diagram |
 | `predictions/` | 424 MB | Precomputed top-10 per gene (a cache, not required) |
@@ -56,14 +56,15 @@ of uint16 gene indices (~13 MB for both genomes) plus a per-key offset, Range-re
 only for displayed guides. Worth doing if users ask which gene a guide hits; not worth
 tripling the download otherwise.
 
-## Entrez gene IDs
+## Entrez gene IDs — done
 
-The original designed against the intersection of a gene's isoforms, not a single
-transcript. Phase 1 resolves a gene ID to one RefSeq transcript and says so in the UI.
+Implemented in `tools/build_genes.py` and `src/data/genes.ts`. 39,760 genes packed at
+4 bits per symbol (A C G T * N) into a 58 MB blob with a 636 KB index; a gene costs one
+Range request. Verified against the 2017 server on five genes, which return identical
+results through the whole pipeline.
 
-To restore the original behaviour, export the intersection table as one JSON file per
-gene (~20 k small files, or grouped into range-addressable bundles) holding the
-intersection sequence, genomic positions and strand. A gene ID then costs one fetch.
+Genomic coordinates were not carried over — only the intersection sequence and strand.
+They are needed only for the transcript diagram below.
 
 The `predictions/` directory is a cache of the top 10 per gene under default options. It
 is not needed for correctness — the engine recomputes in well under a second — and is
