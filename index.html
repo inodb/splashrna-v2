@@ -6,7 +6,7 @@
     <title>SplashRNA — potent shRNA prediction</title>
     <meta
       name="description"
-      content="Design potent miR-E shRNAs with the SplashRNA sequential classifier. Runs entirely in your browser."
+      content="Design potent miR-E shRNAs against any transcript. Runs entirely in your browser."
     />
     <link rel="stylesheet" href="./src/ui/styles.css" />
   </head>
@@ -15,21 +15,26 @@
       <div class="wrap">
         <h1>SplashRNA</h1>
         <p class="tagline">
-          Prediction of potent shRNAs with a sequential classification algorithm.
-          Everything runs in your browser — no sequence you enter leaves this page,
-          except when you ask for a transcript by accession.
+          Pick potent miR-E shRNAs for a target. Paste a sequence, or look up a human
+          gene by ID or RefSeq accession, and you get back the best-scoring guides with
+          their 97-mer constructs ready to order.
+        </p>
+        <p class="tagline small">
+          Scoring happens in your browser, so sequences you paste stay on your machine.
+          The only thing ever sent out is a RefSeq accession, to fetch that transcript
+          from NCBI.
         </p>
       </div>
     </header>
 
     <main class="wrap">
       <section class="panel" aria-labelledby="input-heading">
-        <h2 id="input-heading">Input</h2>
+        <h2 id="input-heading">What do you want to target?</h2>
         <p class="hint">
-          One or more FASTA records. Each record may hold a nucleotide sequence, a
-          RefSeq accession (<code>NM_…</code>), or an Entrez gene ID.
+          One target per FASTA record. Each can be a nucleotide sequence, a human gene
+          ID (<code>7157</code>), or a RefSeq accession (<code>NM_…</code>).
         </p>
-        <label class="sr-only" for="fasta">FASTA input</label>
+        <label class="sr-only" for="fasta">Targets in FASTA format</label>
         <textarea id="fasta" rows="9" spellcheck="false" autocapitalize="off"></textarea>
         <div class="row">
           <button type="button" id="example" class="ghost">Load example</button>
@@ -43,13 +48,14 @@
           <label class="field">
             <span>Predictions per gene</span>
             <input id="count" type="number" min="1" max="500" value="5" />
+            <small>How many of the top-scoring guides to show.</small>
           </label>
 
           <label class="check">
             <input id="removeRE" type="checkbox" checked />
             <span>
               Remove guides with EcoRI or XhoI sites
-              <small>Restriction sites in the 97-mer complicate cloning.</small>
+              <small>These land inside the 97-mer and make it awkward to clone.</small>
             </span>
           </label>
 
@@ -57,7 +63,7 @@
             <input id="inGeneDup" type="checkbox" />
             <span>
               Keep guides that repeat within the transcript
-              <small>Off by default, matching the original server.</small>
+              <small>Otherwise a guide that occurs more than once is dropped.</small>
             </span>
           </label>
 
@@ -66,8 +72,8 @@
             <span>
               Cut at the polyadenylation site
               <small>
-                Skips 3′ sequence absent from the mature mRNA. On by default, as in the
-                original server. Gene IDs only.
+                Ignores sequence downstream of the cleavage site, which is not in the
+                mature mRNA. Gene IDs only.
               </small>
             </span>
           </label>
@@ -75,30 +81,31 @@
           <label class="check">
             <input id="cdsOnly" type="checkbox" />
             <span>
-              Design against the coding sequence only
-              <small>Restricts to the CDS intersection. Gene IDs only.</small>
+              Target the coding sequence only
+              <small>Leaves the UTRs alone. Gene IDs only.</small>
             </span>
           </label>
 
           <label class="check">
             <input id="offTargetDup" type="checkbox" />
             <span>
-              Keep guides matching other transcripts
+              Keep guides that hit other genes
               <small id="offTargetHint">
-                Guides with an exact match in another human or mouse gene.
+                Otherwise a guide is dropped if its 22-mer matches another human or
+                mouse gene exactly.
               </small>
             </span>
           </label>
 
           <label class="field">
-            <span>Off-target filtering</span>
+            <span>How thoroughly to check for off-targets</span>
             <select id="offTargetMode">
-              <option value="top-candidates">Top candidates (fast)</option>
-              <option value="exhaustive">Exhaustive (original order)</option>
+              <option value="top-candidates">Top candidates — fast</option>
+              <option value="exhaustive">Every candidate — slower</option>
             </select>
             <small>
-              The original server checked every tile before truncating. Restricting the
-              check to the best candidates gives the same list far more cheaply.
+              Checking the best few hundred is much quicker and almost always gives the
+              same answer. Switch to every candidate if you need certainty.
             </small>
           </label>
         </div>
@@ -117,19 +124,20 @@
 
     <footer class="wrap">
       <p>
-        Method:
+        If you use these predictions, please cite
         <a
           href="https://doi.org/10.1038/nbt.3807"
           target="_blank"
           rel="noopener noreferrer"
           >Pelossof R, Fairchild L, et al. Prediction of potent shRNAs with a sequential
           classification algorithm. <em>Nature Biotechnology</em> 35, 350–353 (2017)</a
-        >.
+        >, and add to your methods: “The shRNAs were designed using the SplashRNA
+        algorithm (Pelossof and Fairchild et al., 2017).”
       </p>
       <p class="small">
-        A rewrite of the original SplashRNA server. The classifiers are the published
-        2017 models, re-expressed without their original dependencies; scores are
-        reproduced to within 10<sup>−6</sup> of the originals.
+        These are the published 2017 classifiers, rebuilt to run without their original
+        dependencies. Scores match the ones the original server produced to within
+        10<sup>−6</sup>.
       </p>
     </footer>
 

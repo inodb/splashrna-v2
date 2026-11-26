@@ -131,7 +131,7 @@ async function resolveEntry(
       // Preferred path: the isoform intersection, as the original server used.
       const genes = await getGeneIndex();
       if (genes) {
-        setStatus(`Loading the isoform intersection for Entrez gene ${entry.value}…`);
+        setStatus(`Looking up gene ${entry.value}…`);
         const intersection = await genes.get(Number.parseInt(entry.value, 10));
         if (intersection) {
           // polyA trimming and CDS-only apply to gene IDs, where the intersection and
@@ -146,7 +146,7 @@ async function resolveEntry(
       }
 
       // Fallback: a single RefSeq transcript, which is not the same thing.
-      setStatus(`Looking up Entrez gene ${entry.value}…`);
+      setStatus(`Looking up gene ${entry.value} at NCBI…`);
       const gene = await fetchGeneTranscripts(entry.value);
       if (gene.accessions.length === 0) {
         throw new Error(`No RefSeq mRNA transcripts found for Entrez gene ${entry.value}`);
@@ -156,11 +156,11 @@ async function resolveEntry(
       return {
         label: `${entry.label} — ${gene.symbol} (${accession})`,
         sequence: record.sequence,
-        note: `The isoform-intersection index is not deployed on this host, so ${accession} was used${
+        note: `Gene data is not available here, so ${accession} was used${
           gene.accessions.length > 1
-            ? ` (${gene.symbol} has ${gene.accessions.length} RefSeq transcripts)`
+            ? ` — note ${gene.symbol} has ${gene.accessions.length} RefSeq transcripts`
             : ""
-        }. The original server designed against the intersection of all isoforms, so results may differ.`,
+        }. Designing against a single transcript can give different guides than the isoform intersection.`,
       };
     }
 
@@ -273,7 +273,7 @@ function renderResults(results: DesignResult[]): void {
 async function run(): Promise<void> {
   const entries = parseFasta(els.fasta.value);
   if (entries.length === 0) {
-    setStatus("Enter at least one sequence, accession, or gene ID.", true);
+    setStatus("Add a target first — a sequence, a gene ID, or a RefSeq accession.", true);
     return;
   }
 
@@ -284,11 +284,10 @@ async function run(): Promise<void> {
   els.progress.value = 0;
 
   try {
-    setStatus("Loading the SplashRNA model…");
+    setStatus("Loading the scoring model…");
     const engine = await getScorer();
     const options = readOptions();
 
-    setStatus("Checking for the off-target index…");
     const index = await getOffTargetIndex();
     const missingIndex = index === null;
 
@@ -310,7 +309,7 @@ async function run(): Promise<void> {
       if (note) result.warnings.unshift(note);
       if (missingIndex) {
         result.warnings.push(
-          "Off-target filtering was skipped: the index is not deployed on this host. Guides may match other human or mouse transcripts.",
+          "Off-target filtering was skipped — that data is not available here, so these guides may also hit other human or mouse genes.",
         );
       }
       results.push(result);
@@ -350,6 +349,6 @@ els.fasta.value = EXAMPLE_INPUT;
 // rather than claiming either way and being wrong.
 void getOffTargetIndex().then((index) => {
   els.offTargetHint.textContent = index
-    ? "Guides with an exact match in another human or mouse gene."
-    : "Unavailable: the off-target index is not deployed on this host.";
+    ? "Otherwise a guide is dropped if its 22-mer matches another human or mouse gene exactly."
+    : "Off-target data is not available here, so this cannot be checked.";
 });

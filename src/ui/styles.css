@@ -73,6 +73,11 @@ h1 {
   max-width: 62ch;
 }
 
+/* The privacy note sits under the lede and needs air between the two. */
+.tagline + .tagline {
+  margin-top: 10px;
+}
+
 h2 {
   margin: 0 0 4px;
   font-size: 1.05rem;
