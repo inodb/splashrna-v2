@@ -45,7 +45,49 @@ const els = {
   progress: $<HTMLProgressElement>("progress"),
   results: $<HTMLElement>("results"),
   offTargetHint: $<HTMLElement>("offTargetHint"),
+  academic: $<HTMLInputElement>("academic"),
+  email: $<HTMLInputElement>("email"),
 };
+
+/**
+ * The academic-use gate, as the original server had it.
+ *
+ * That server blocked results until the box was ticked and an address matching this
+ * same pattern was supplied, then recorded the address. Neither side verified
+ * anything, so this was always an attestation rather than enforcement — and a static
+ * site has nowhere to record it, so only the attestation survives. Whether it is
+ * required at all is a licensing question, not a technical one.
+ */
+const EMAIL_PATTERN = /[^@]+@[^@]+\.[^@]+/;
+const STORAGE_KEY = "splashrna.academic";
+
+function gateSatisfied(): boolean {
+  return els.academic.checked && EMAIL_PATTERN.test(els.email.value.trim());
+}
+
+/** Remember the attestation locally so it is not retyped on every visit. */
+function rememberGate(): void {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ academic: els.academic.checked, email: els.email.value.trim() }),
+    );
+  } catch {
+    // Private browsing, or storage disabled. Nothing here is important enough to warn about.
+  }
+}
+
+function restoreGate(): void {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    const { academic, email } = JSON.parse(saved) as { academic: boolean; email: string };
+    els.academic.checked = Boolean(academic);
+    els.email.value = typeof email === "string" ? email : "";
+  } catch {
+    // Ignore anything unparseable.
+  }
+}
 
 const plural = (n: number, singular: string, plural = `${singular}s`) =>
   `${n.toLocaleString()} ${n === 1 ? singular : plural}`;
@@ -323,6 +365,16 @@ function renderResults(results: DesignResult[]): void {
 }
 
 async function run(): Promise<void> {
+  if (!gateSatisfied()) {
+    setStatus(
+      "Please confirm that you are an academic user by checking the box and entering your email.",
+      true,
+    );
+    (els.academic.checked ? els.email : els.academic).focus();
+    return;
+  }
+  rememberGate();
+
   const entries = parseFasta(els.fasta.value);
   if (entries.length === 0) {
     setStatus("Add a target first — a sequence, a gene ID, or a RefSeq accession.", true);
@@ -419,6 +471,7 @@ els.csv.addEventListener("click", () => {
 });
 
 els.fasta.value = EXAMPLE_INPUT;
+restoreGate();
 
 // Say up front whether off-target filtering is actually available on this deployment,
 // rather than claiming either way and being wrong.

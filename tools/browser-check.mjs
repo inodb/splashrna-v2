@@ -89,7 +89,14 @@ function watch(page) {
   };
 }
 
+/** The academic-use gate blocks designing until it is satisfied. */
+async function satisfyGate(page) {
+  await page.check("#academic");
+  await page.fill("#email", "someone@example.edu");
+}
+
 async function runDesign(page, fasta, { timeout = 120000 } = {}) {
+  await satisfyGate(page);
   await page.fill("#fasta", fasta);
   await page.click("#run");
   await page.waitForFunction(
@@ -146,6 +153,22 @@ try {
 
     const csvDisabled = await page.locator("#csv").isDisabled();
     note(!csvDisabled, "CSV button enabled after a run");
+
+    // The gate must actually block, or it is decoration.
+    await page.uncheck("#academic");
+    await page.fill("#email", "");
+    await page.click("#run");
+    await page.waitForFunction(
+      () => document.getElementById("status").classList.contains("error"),
+      { timeout: 10000 },
+    ).catch(() => {});
+    const blockedMsg = await page.textContent("#status");
+    note(
+      /academic user/i.test(blockedMsg ?? ""),
+      "academic-use gate blocks designing",
+      (blockedMsg ?? "").slice(0, 60),
+    );
+    await satisfyGate(page);
 
     await page.screenshot({ path: `${shotDir}/02-results.png`, fullPage: true });
 

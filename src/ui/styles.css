@@ -445,3 +445,17 @@ footer a {
   .key-utr { background: #3a6b8f; }
   .key-guide { background: #ff922b; }
 }
+
+.email-field {
+  margin-top: 12px;
+  max-width: 420px;
+}
+
+.email-field input {
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}

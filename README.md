@@ -208,6 +208,24 @@ Guide ticks are placed by mapping each transcript offset back to a genomic coord
 `tests/annotations.test.ts` checks all 80 of those against the positions the 2017
 server printed, on both strands.
 
+## Academic use
+
+The original blocked results until the user ticked "I am a non-profit, academic user"
+and supplied an email address, which it then recorded — 104,281 entries from about
+3,800 unique addresses over the service's life.
+
+The attestation is reproduced here. **The record is not**, and cannot be: a static site
+has nowhere to write one. Neither version verified anything — any string matching
+`[^@]+@[^@]+\.[^@]+` passed — so this was always an attestation rather than
+enforcement, but the original at least kept evidence that someone made it.
+
+If MSK needs that record for licensing, this needs a form endpoint or a small service,
+which is the one thing here that cannot be done statically. Whether the gate is
+required at all is a licensing question, not a technical one.
+
+The collected addresses stay on the legacy host. They are not archived and not in
+either repository.
+
 ## Not yet carried over
 
 * Gene *names* for off-target hits. The index says how many genes a guide matches, not
