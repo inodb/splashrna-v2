@@ -41,6 +41,11 @@ interface GenomeManifest {
   dirBytes: number;
   keys: string;
   directory: string;
+  genes: string;
+  geneIds: string;
+  geneCount: number;
+  geneRefs: number;
+  dirRecordBytes: number;
 }
 
 interface Manifest {
@@ -49,15 +54,21 @@ interface Manifest {
   genomes: Record<string, GenomeManifest>;
 }
 
-/** One entry of a decoded block: the key and how many genes carry it. */
+/**
+ * One entry of a decoded block: the key, how many genes carry it, and where that
+ * gene list starts. The start is derived by running the counts forward from the
+ * block's own starting index, so no per-key offset table has to be stored.
+ */
 interface BlockEntry {
   key: number;
   geneCount: number;
+  geneStart: number;
 }
 
-function decodeBlock(view: Uint8Array, limit: number): BlockEntry[] {
+function decodeBlock(view: Uint8Array, limit: number, geneStart: number): BlockEntry[] {
   const entries: BlockEntry[] = [];
   let pos = 0;
+  let geneCursor = geneStart;
 
   // First key: six big-endian bytes. Multiplication, not shifts -- see the file note.
   let key = 0;
@@ -74,10 +85,15 @@ function decodeBlock(view: Uint8Array, limit: number): BlockEntry[] {
     }
   };
 
-  entries.push({ key, geneCount: readVarint() });
+  let count = readVarint();
+  entries.push({ key, geneCount: count, geneStart: geneCursor });
+  geneCursor += count;
+
   while (entries.length < limit && pos < view.length) {
     key += readVarint();
-    entries.push({ key, geneCount: readVarint() });
+    count = readVarint();
+    entries.push({ key, geneCount: count, geneStart: geneCursor });
+    geneCursor += count;
   }
   return entries;
 }
@@ -87,6 +103,10 @@ class Genome {
   private readonly firstKeys: Float64Array;
   /** Byte offset of each block, plus a final sentinel of the file length. */
   private readonly offsets: Float64Array;
+  /** Index of each block's first gene reference in the genes payload. */
+  private readonly geneStarts: Float64Array;
+  /** Entrez IDs the uint16 gene references point at; loaded on first use. */
+  private geneIds: number[] | null = null;
   private readonly cache = new Map<number, BlockEntry[]>();
   private whole: Uint8Array | null = null;
 
@@ -98,14 +118,17 @@ class Genome {
   ) {
     const view = new DataView(directory);
     const blocks = manifest.blocks;
+    const stride = manifest.dirRecordBytes;
     this.firstKeys = new Float64Array(blocks);
     this.offsets = new Float64Array(blocks + 1);
+    this.geneStarts = new Float64Array(blocks);
 
     for (let i = 0; i < blocks; i++) {
-      const base = i * 10;
+      const base = i * stride;
       this.offsets[i] = view.getUint32(base, false);
+      this.geneStarts[i] = view.getUint32(base + 4, false);
       let key = 0;
-      for (let b = 0; b < 6; b++) key = key * 256 + view.getUint8(base + 4 + b);
+      for (let b = 0; b < 6; b++) key = key * 256 + view.getUint8(base + 8 + b);
       this.firstKeys[i] = key;
     }
     this.offsets[blocks] = manifest.keysBytes;
@@ -155,7 +178,7 @@ class Genome {
       }
     }
 
-    const entries = decodeBlock(bytes, this.blockSize);
+    const entries = decodeBlock(bytes, this.blockSize, this.geneStarts[index]);
     this.cache.set(index, entries);
     return entries;
   }
@@ -168,6 +191,61 @@ class Genome {
       throw new Error(`Off-target index fetch failed (HTTP ${response.status})`);
     }
     this.whole = new Uint8Array(await response.arrayBuffer());
+  }
+
+  /** The Entrez ID table, fetched once and only when gene names are first asked for. */
+  private async loadGeneIds(): Promise<number[]> {
+    if (this.geneIds) return this.geneIds;
+    const response = await fetch(`${this.baseUrl}/${this.manifest.geneIds}`);
+    if (!response.ok) {
+      throw new Error(`Could not load ${this.assembly} gene IDs (HTTP ${response.status})`);
+    }
+    this.geneIds = (await response.json()) as number[];
+    return this.geneIds;
+  }
+
+  /**
+   * Entrez IDs of the genes carrying each key.
+   *
+   * Only called for guides that are actually displayed, so this fetches a few dozen
+   * bytes per guide rather than the 6 MB payload.
+   */
+  async genesFor(keys: number[]): Promise<Map<number, number[]>> {
+    const wanted: { key: number; entry: BlockEntry }[] = [];
+    for (const key of keys) {
+      const block = this.blockFor(key);
+      if (block < 0) continue;
+      const entries = this.cache.get(block);
+      const entry = entries?.find((e) => e.key === key);
+      if (entry && entry.geneCount > 0) wanted.push({ key, entry });
+    }
+    if (wanted.length === 0) return new Map();
+
+    const ids = await this.loadGeneIds();
+    const out = new Map<number, number[]>();
+
+    await Promise.all(
+      wanted.map(async ({ key, entry }) => {
+        const start = entry.geneStart * 2;
+        const end = start + entry.geneCount * 2;
+        const response = await fetch(`${this.baseUrl}/${this.manifest.genes}`, {
+          headers: { Range: `bytes=${start}-${end - 1}` },
+        });
+        if (!response.ok) return;
+        let bytes = new Uint8Array(await response.arrayBuffer());
+        if (response.status === 200 && bytes.length === this.manifest.geneRefs * 2) {
+          bytes = bytes.subarray(start, end);
+        }
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const genes: number[] = [];
+        for (let i = 0; i < entry.geneCount; i++) {
+          const index = view.getUint16(i * 2, false);
+          if (index < ids.length) genes.push(ids[index]);
+        }
+        out.set(key, genes);
+      }),
+    );
+    return out;
   }
 
   /**
@@ -224,8 +302,10 @@ export class StaticOffTargetIndex implements OffTargetIndex {
       throw new Error(`No off-target index at ${baseUrl} (HTTP ${response.status})`);
     }
     const manifest = (await response.json()) as Manifest;
-    if (manifest.formatVersion !== 1) {
-      throw new Error(`Unsupported off-target index version ${manifest.formatVersion}`);
+    if (manifest.formatVersion !== 2) {
+      throw new Error(
+        `Unsupported off-target index version ${manifest.formatVersion}; rebuild with tools/build_offtarget.py`,
+      );
     }
 
     const genomes = await Promise.all(
@@ -264,5 +344,30 @@ export class StaticOffTargetIndex implements OffTargetIndex {
       });
     }
     return result;
+  }
+
+  /**
+   * Fill in the Entrez IDs behind the counts, for a handful of guides.
+   *
+   * Separate from `lookup` because the counts are needed for every candidate while the
+   * IDs are needed only for the few that get shown.
+   */
+  async annotate(hits: Map<string, OffTargetHits>): Promise<void> {
+    const keys = new Map<string, number>();
+    for (const guide of hits.keys()) {
+      const key = packKmer(reverseComplement(guide));
+      if (key !== null) keys.set(guide, key);
+    }
+    const unique = [...new Set(keys.values())];
+    const [human, mouse] = await Promise.all([
+      this.human.genesFor(unique),
+      this.mouse.genesFor(unique),
+    ]);
+    for (const [guide, key] of keys) {
+      const hit = hits.get(guide);
+      if (!hit) continue;
+      hit.humanIds = human.get(key) ?? [];
+      hit.mouseIds = mouse.get(key) ?? [];
+    }
   }
 }

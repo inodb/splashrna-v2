@@ -8,6 +8,12 @@ export default defineConfig({
     outDir: "dist",
     target: "es2022",
     assetsInlineLimit: 0,
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        help: "help.html",
+      },
+    },
   },
   test: {
     globals: true,

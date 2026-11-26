@@ -459,3 +459,72 @@ footer a {
   color: var(--text);
   font: inherit;
 }
+
+.offtarget-genes {
+  font-size: 0.78rem;
+  margin-top: 2px;
+}
+
+.offtarget-genes a {
+  color: var(--accent);
+}
+
+/* --- help page ---------------------------------------------------------------------- */
+
+.help h2 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.help h3 {
+  font-size: 0.95rem;
+  margin: 18px 0 6px;
+}
+
+.help p,
+.help li {
+  max-width: 68ch;
+}
+
+.help dt {
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+.help dd {
+  margin: 3px 0 0;
+  color: var(--muted);
+  max-width: 68ch;
+}
+
+.help pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  font-size: 0.84rem;
+}
+
+.help code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+}
+
+.help blockquote {
+  margin: 8px 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+}
+
+.help .tag {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1px 7px;
+  margin-left: 6px;
+  vertical-align: 1px;
+}

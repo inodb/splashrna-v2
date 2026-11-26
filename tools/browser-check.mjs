@@ -223,6 +223,25 @@ try {
     await context.close();
   }
 
+  // --- 2b. The help page ------------------------------------------------------------
+  {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await context.newPage();
+    const problems = watch(page);
+    await page.goto(new URL("help.html", baseUrl).href, { waitUntil: "networkidle" });
+    note((await page.title()).includes("help"), "help page loads", await page.title());
+
+    const headings = await page.locator("h2").allTextContents();
+    note(headings.length >= 5, "help has its sections", `${headings.length} sections`);
+    note(
+      (await page.locator('a[href="./"]').count()) > 0,
+      "help links back to the tool",
+    );
+    note(problems.failedRequests.length === 0, "help page has no failed requests");
+    await page.screenshot({ path: `${shotDir}/06-help.png`, fullPage: true });
+    await context.close();
+  }
+
   // --- 3. Dark mode ----------------------------------------------------------------
   {
     const context = await browser.newContext({

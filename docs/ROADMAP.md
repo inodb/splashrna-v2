@@ -53,12 +53,12 @@ which returns the same list in almost every case; `"exhaustive"` reproduces the 
 ordering when it matters. The default is the cheap path, and it is a user-visible
 setting rather than a silent change.
 
-### Remaining: gene names
+### Gene names — done
 
-The index carries a count, not the matching gene IDs. Adding them means a second file
-of uint16 gene indices (~13 MB for both genomes) plus a per-key offset, Range-requested
-only for displayed guides. Worth doing if users ask which gene a guide hits; not worth
-tripling the download otherwise.
+The matching Entrez IDs ship as uint16 indices (~13 MB for both genomes) alongside a
+small ID table. No per-key offset table was needed: a key's slice starts at its block's
+gene index plus the counts of the keys before it, which the keys file already carries.
+Fetched only for displayed guides, so a lookup costs a few dozen bytes.
 
 ## Entrez gene IDs, polyA cut and CDS-only — done
 

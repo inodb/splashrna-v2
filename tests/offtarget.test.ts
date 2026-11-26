@@ -18,6 +18,7 @@ import { decodeModel, type RawModelBundle } from "../src/engine/model.js";
 import { SplashScorer } from "../src/engine/scorer.js";
 import { reverseComplement } from "../src/engine/sequence.js";
 import sample from "./fixtures/offtarget-sample.json" with { type: "json" };
+import geneCases from "./fixtures/offtarget-genes.json" with { type: "json" };
 import tiles from "./fixtures/tiles.json" with { type: "json" };
 
 const OFFTARGET_DIR = fileURLToPath(new URL("../public/offtarget", import.meta.url));
@@ -186,6 +187,41 @@ function loadScorer(): SplashScorer {
     decodeModel(JSON.parse(readFileSync(modelPath, "utf8")) as RawModelBundle),
   );
 }
+
+describe.skipIf(!BUILT)("off-target gene identities", () => {
+  it("returns exactly the Entrez IDs the legacy tables list", async () => {
+    restore = installFileFetch(OFFTARGET_DIR);
+    const index = await StaticOffTargetIndex.load("./offtarget");
+
+    // Guides are the reverse complement of the sense k-mer the tables are keyed by.
+    const guides = geneCases.cases.map((c) => reverseComplement(c.kmer));
+    const hits = await index.lookup(guides);
+    await index.annotate(hits);
+
+    for (let i = 0; i < geneCases.cases.length; i++) {
+      const c = geneCases.cases[i];
+      const hit = hits.get(guides[i]);
+      expect(hit, `missing ${c.genome} ${c.kmer}`).toBeDefined();
+      const ids = (c.genome === "human" ? hit!.humanIds : hit!.mouseIds) ?? [];
+      expect([...ids].sort((a, b) => a - b), `${c.genome} ${c.kmer}`).toEqual(c.geneIds);
+      // The count and the list must agree.
+      const count = c.genome === "human" ? hit!.humanGenes : hit!.mouseGenes;
+      expect(count).toBe(c.geneIds.length);
+    }
+  });
+
+  it("leaves IDs empty for guides with no match", async () => {
+    restore = installFileFetch(OFFTARGET_DIR);
+    const index = await StaticOffTargetIndex.load("./offtarget");
+    const guides = sample.absent.slice(0, 20).map((k) => reverseComplement(k));
+    const hits = await index.lookup(guides);
+    await index.annotate(hits);
+    for (const g of guides) {
+      expect(hits.get(g)!.humanIds ?? []).toEqual([]);
+      expect(hits.get(g)!.mouseIds ?? []).toEqual([]);
+    }
+  });
+});
 
 describe.skipIf(!BUILT)("end to end with off-target filtering", () => {
   it("removes guides that match other genes", async () => {

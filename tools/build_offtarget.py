@@ -30,17 +30,21 @@ Output format, per genome
   Self-contained blocks mean a client can fetch one block with a Range request and
   decode it without touching the rest of the file.
 
-`<genome>-keys.dir`  One 10-byte record per block, so a lookup is a binary search in
+`<genome>-keys.dir`  One 14-byte record per block, so a lookup is a binary search in
   memory followed by at most one range request:
 
       uint32    byte offset of the block within the keys file
+      uint32    index of the block's first gene reference in the genes file
       6 bytes   first 22-mer of the block
 
-`manifest.json`  Sizes, counts, and the block size.
+`<genome>-genes.bin`  The matching genes themselves: uint16 indices into `geneIds`,
+  concatenated in key order. A key's slice starts at its block's gene index plus the
+  counts of the keys before it in that block, and runs for its own count — so no
+  per-key offset table is needed. Fetched only for guides actually shown.
 
-Gene *names* are deliberately not emitted. Membership plus a count is all the filter
-needs, and carrying the ~13 MB of gene lists would triple the download. See
-docs/ROADMAP.md for the follow-up that adds them behind a Range request.
+`<genome>-genes.json`  The Entrez gene IDs those uint16 values index.
+
+`manifest.json`  Sizes, counts, and the block size.
 """
 
 from __future__ import annotations
@@ -54,6 +58,7 @@ import sys
 BASE = {"A": 0, "C": 1, "G": 2, "T": 3}
 BLOCK_SIZE = 1024
 GENOMES = {"human": "hg38", "mouse": "mm10"}
+FORMAT_VERSION = 2
 
 
 def pack_kmer(seq: str) -> int:
@@ -76,11 +81,17 @@ def build_genome(source: pathlib.Path, out_dir: pathlib.Path, genome: str) -> di
     with source.open("rb") as handle:
         table = pickle.load(handle, encoding="latin1")
 
+    # Map every Entrez ID to a uint16 index, so the payload is two bytes per reference.
+    gene_ids = sorted({int(g) for genes in table.values() for g in genes})
+    gene_index = {g: i for i, g in enumerate(gene_ids)}
+    if len(gene_ids) > 0xFFFF:
+        raise SystemExit(f"{genome}: {len(gene_ids)} genes exceeds uint16")
+
     entries = []
     skipped = 0
     for kmer, genes in table.items():
         try:
-            entries.append((pack_kmer(kmer), len(genes)))
+            entries.append((pack_kmer(kmer), [gene_index[int(g)] for g in genes]))
         except KeyError:
             skipped += 1  # ambiguous bases; the scorer cannot handle these anyway
     entries.sort()
@@ -88,29 +99,36 @@ def build_genome(source: pathlib.Path, out_dir: pathlib.Path, genome: str) -> di
 
     keys = bytearray()
     directory = bytearray()
+    genes_payload = bytearray()
 
     for start in range(0, len(entries), BLOCK_SIZE):
         block = entries[start : start + BLOCK_SIZE]
         directory += struct.pack(">I", len(keys))
+        directory += struct.pack(">I", len(genes_payload) // 2)
         directory += block[0][0].to_bytes(6, "big")
 
         keys += block[0][0].to_bytes(6, "big")
-        keys += varint(block[0][1])
+        keys += varint(len(block[0][1]))
+        genes_payload += struct.pack(f">{len(block[0][1])}H", *block[0][1])
         previous = block[0][0]
-        for value, count in block[1:]:
+        for value, genes in block[1:]:
             keys += varint(value - previous)
-            keys += varint(count)
+            keys += varint(len(genes))
+            genes_payload += struct.pack(f">{len(genes)}H", *genes)
             previous = value
 
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"{genome}-keys.bin").write_bytes(bytes(keys))
     (out_dir / f"{genome}-keys.dir").write_bytes(bytes(directory))
+    (out_dir / f"{genome}-genes.bin").write_bytes(bytes(genes_payload))
+    (out_dir / f"{genome}-genes.json").write_text(json.dumps(gene_ids, separators=(",", ":")))
 
     blocks = (len(entries) + BLOCK_SIZE - 1) // BLOCK_SIZE
     print(
         f"{genome:6s} {source.name:28s} {len(entries):>9,} keys  "
-        f"{len(keys)/1e6:5.2f} MB keys  {len(directory)/1e3:5.1f} KB dir  "
-        f"{blocks:,} blocks" + (f"  ({skipped} skipped)" if skipped else "")
+        f"{len(keys)/1e6:5.2f} MB keys  {len(genes_payload)/1e6:5.2f} MB genes  "
+        f"{len(gene_ids):,} ids  {blocks:,} blocks"
+        + (f"  ({skipped} skipped)" if skipped else "")
     )
 
     return {
@@ -121,6 +139,11 @@ def build_genome(source: pathlib.Path, out_dir: pathlib.Path, genome: str) -> di
         "dirBytes": len(directory),
         "keys": f"{genome}-keys.bin",
         "directory": f"{genome}-keys.dir",
+        "genes": f"{genome}-genes.bin",
+        "geneIds": f"{genome}-genes.json",
+        "geneCount": len(gene_ids),
+        "geneRefs": len(genes_payload) // 2,
+        "dirRecordBytes": 14,
     }
 
 
@@ -133,7 +156,7 @@ def main() -> int:
     out_dir = pathlib.Path(sys.argv[2] if len(sys.argv) > 2 else "public/offtarget")
 
     manifest = {
-        "formatVersion": 1,
+        "formatVersion": FORMAT_VERSION,
         "blockSize": BLOCK_SIZE,
         "note": (
             "22-mers occurring in two or more genes. Built from the legacy SplashRNA "

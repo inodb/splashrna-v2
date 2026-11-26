@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SplashRNA — help</title>
+    <meta name="description" content="How to use SplashRNA: input formats, options, reading the results, and what the warnings mean." />
+    <link rel="stylesheet" href="./src/ui/styles.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="wrap">
+        <h1>Help</h1>
+        <p class="tagline">
+          <a href="./">← back to SplashRNA</a>
+        </p>
+      </div>
+    </header>
+
+    <main class="wrap help">
+      <section class="panel">
+        <h2>What to enter</h2>
+        <p>
+          One target per FASTA record: a header line beginning with <code>&gt;</code>,
+          then the target itself. Several records can be submitted at once.
+        </p>
+        <pre><code>&gt; TP53
+7157
+&gt; by accession
+NM_001127233.1
+&gt; a sequence of my own
+ATGTAAATAACTTTAATAAAACGTTTATAGCAGTTACACAG</code></pre>
+        <p>Each record can be one of three things:</p>
+        <ul>
+          <li>
+            <strong>A human Entrez gene ID.</strong> Guides are designed against the
+            <em>intersection</em> of that gene's RefSeq isoforms — the stretch common
+            to all of them — so a guide knocks down every isoform. Human reference
+            hg38; off-targets are checked against hg38 and mm10.
+          </li>
+          <li>
+            <strong>A RefSeq accession</strong> (<code>NM_…</code>). The current
+            sequence is fetched from NCBI, and guides are designed against that single
+            transcript.
+          </li>
+          <li>
+            <strong>A nucleotide sequence</strong> of A, C, G, T or N. Tiles containing
+            N are skipped.
+          </li>
+        </ul>
+        <p class="hint">
+          To turn gene symbols into Entrez IDs, the
+          <a href="https://david.ncifcrf.gov/conversion.jsp" target="_blank" rel="noopener noreferrer">DAVID
+          Gene ID Conversion tool</a> works well: paste your list, choose your
+          identifier type, pick <em>Gene List</em>, then convert to
+          <code>ENTREZ_GENE_ID</code>.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Options</h2>
+        <dl>
+          <dt>Predictions per gene</dt>
+          <dd>How many of the top-scoring guides to show. Default 5.</dd>
+
+          <dt>Remove guides with EcoRI or XhoI sites</dt>
+          <dd>
+            Drops guides whose 97-mer contains <code>GAATTC</code> or
+            <code>CTCGAG</code>, which complicate cloning. On by default; switch it off
+            and such guides are kept but flagged.
+          </dd>
+
+          <dt>Cut at the polyadenylation site <span class="tag">gene IDs only</span></dt>
+          <dd>
+            Ignores sequence downstream of the most proximal annotated cleavage site,
+            which is not in the mature mRNA. On by default. Where no polyA site is
+            annotated, the coding sequence is used instead, or the untrimmed transcript
+            if there is no CDS either — the results say which.
+          </dd>
+
+          <dt>Target the coding sequence only <span class="tag">gene IDs only</span></dt>
+          <dd>Excludes the 5′ and 3′ UTRs.</dd>
+
+          <dt>Keep guides that repeat within the transcript</dt>
+          <dd>
+            A guide matching the target gene in more than one place is dropped by
+            default; tick this to keep it.
+          </dd>
+
+          <dt>Keep guides that hit other genes</dt>
+          <dd>
+            A guide whose 22-mer exactly matches another human or mouse gene is dropped
+            by default; tick this to keep it, with the matching genes listed.
+          </dd>
+
+          <dt>How thoroughly to check for off-targets</dt>
+          <dd>
+            Checking the best few hundred candidates is much faster and almost always
+            gives the same list. <em>Every candidate</em> checks all of them, which is
+            what the original server did.
+          </dd>
+        </dl>
+      </section>
+
+      <section class="panel">
+        <h2>Reading the results</h2>
+        <dl>
+          <dt>Position</dt>
+          <dd>Where the guide's target sits in the transcript, counted from its start.</dd>
+
+          <dt>Antisense guide</dt>
+          <dd>The 22-nt guide strand — what you order.</dd>
+
+          <dt>SplashRNA</dt>
+          <dd>
+            The combined score. <strong>Guides scoring above 1.0 are generally
+            strong; above 2.0, very strong.</strong> If the best score for a target is
+            low, see the warnings below.
+          </dd>
+
+          <dt>miR-30 and miR-E</dt>
+          <dd>
+            The two underlying classifiers. The miR-30 score gates: the miR-E score only
+            contributes when miR-30 exceeds 1.1.
+          </dd>
+
+          <dt>Off-target</dt>
+          <dd>
+            How many other human and mouse genes contain this exact 22-mer, with their
+            Entrez IDs linked to NCBI. <em>unique</em> means none. A dash means the
+            off-target index is not deployed here, so nothing was checked.
+          </dd>
+
+          <dt>97-mer construct</dt>
+          <dd>The full miR-30 construct containing the guide, ready to order.</dd>
+        </dl>
+
+        <h3>The transcript diagram</h3>
+        <p>
+          For a gene ID, the results include a diagram: one lane per RefSeq isoform with
+          coding blocks in dark blue and UTRs in light blue, the designed region in
+          green, and a tick at the genomic position of each predicted shRNA. Hover a
+          tick for its sequence, position and score.
+        </p>
+        <p class="hint">
+          These are the 2015 annotations the predictions were computed against, not
+          current RefSeq, so that the picture agrees with the numbers beside it.
+        </p>
+
+        <h3>Exon junctions</h3>
+        <p>
+          In an intersection sequence an asterisk (<code>*</code>) separates
+          non-contiguous blocks. Guides are never designed across one, since that
+          22-mer does not exist in any real transcript.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Warnings</h2>
+        <dl>
+          <dt>The best predicted score is below 1.0</dt>
+          <dd>
+            Strong guides usually score above 1.0. A low best score often means the
+            input was short, only a small part of the gene is shared across isoforms, or
+            the sequence is very GC-rich. Supplying a longer sequence, or a single
+            isoform by RefSeq accession, often helps.
+          </dd>
+
+          <dt>The transcript is shorter than 1 kb</dt>
+          <dd>
+            Little sequence to choose from. Picking the isoform most relevant to you
+            usually gives better guides than the intersection.
+          </dd>
+
+          <dt>EcoRI or XhoI site in the 97-mer</dt>
+          <dd>
+            Shown when you have chosen to keep such guides. They can still be used, but
+            cloning is harder.
+          </dd>
+
+          <dt>Occurs more than once in this transcript</dt>
+          <dd>Shown when you have chosen to keep in-gene repeats.</dd>
+
+          <dt>Exact 22-mer match in other genes</dt>
+          <dd>
+            Shown when you have chosen to keep off-target hits. Expect knockdown of the
+            listed genes as well.
+          </dd>
+
+          <dt>Could not find annotation for polyadenylation site</dt>
+          <dd>
+            No polyA site is annotated for this gene, so the coding sequence was used
+            instead — or the untrimmed transcript where there is no CDS.
+          </dd>
+        </dl>
+      </section>
+
+      <section class="panel">
+        <h2>The downloaded CSV</h2>
+        <p>
+          <em>Download CSV</em> gives everything in the table plus the full construct:
+          <code>Feature</code>, <code>shRNA.name</code>, <code>Position</code>,
+          <code>Antisense.Guide.Sequence</code>, <code>SplashRNA</code>,
+          <code>miR30.score</code>, <code>miRE.score</code>,
+          <code>97mer.construct</code>, <code>Warnings</code>, and the off-target
+          counts and Entrez IDs for each genome.
+        </p>
+        <p class="hint">
+          <strong>If you are comparing against output from the old server:</strong> it
+          loaded the human and mouse tables into the wrong variables, so its Human and
+          Mouse columns were swapped. Filtering was unaffected — a guide was dropped if
+          either matched — but the species labels on archived CSVs are the wrong way
+          round. These are correct.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Contact</h2>
+        <p>
+          Questions about the algorithm, the predictions or this software go to
+          <strong>Christina Leslie</strong>, Computational and Systems Biology,
+          Memorial Sloan Kettering Cancer Center.
+        </p>
+        <p class="hint">
+          Problems with this site specifically — rather than the method — belong on the
+          <a href="https://github.com/mskcc/splashrna-v2/issues" target="_blank" rel="noopener noreferrer">issue
+          tracker</a>.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Citing</h2>
+        <p>
+          Pelossof R, Fairchild L, Huang CH, et al. Prediction of potent shRNAs with a
+          sequential classification algorithm.
+          <em>Nature Biotechnology</em> 35, 350–353 (2017).
+          <a href="https://doi.org/10.1038/nbt.3807" target="_blank" rel="noopener noreferrer">doi:10.1038/nbt.3807</a>
+        </p>
+        <p>And in your methods:</p>
+        <blockquote>
+          The shRNAs were designed using the SplashRNA algorithm (Pelossof and Fairchild
+          et al., 2017).
+        </blockquote>
+        <p class="hint">
+          SplashRNA is for non-profit, academic use. Commercial use needs a licence —
+          contact MSK.
+        </p>
+      </section>
+    </main>
+
+    <footer class="wrap">
+      <p class="small">
+        <a href="./">← back to SplashRNA</a>
+        &nbsp;·&nbsp; © Memorial Sloan Kettering Cancer Center 2012–2026
+      </p>
+    </footer>
+  </body>
+</html>

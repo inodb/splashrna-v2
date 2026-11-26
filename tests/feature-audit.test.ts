@@ -191,6 +191,7 @@ describe("output: CSV export", () => {
       "shRNA.name", "Position", "Antisense.Guide.Sequence", "SplashRNA",
       "miR30.score", "miRE.score", "97mer.construct", "Warnings",
       "Human.22mer.match.gene.count", "Mouse.22mer.match.gene.count",
+      "Human.match.entrezIDs", "Mouse.match.entrezIDs",
     ]) {
       expect(header, `missing column ${col}`).toContain(col);
     }

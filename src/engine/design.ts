@@ -37,11 +37,11 @@ export interface OffTargetHits {
   humanGenes: number;
   mouseGenes: number;
   /**
-   * Entrez gene identifiers, when the index can supply them. The static index ships
-   * counts only; carrying the full gene lists would triple its size.
+   * Entrez gene IDs behind those counts, filled in only for guides that are displayed.
+   * Absent when the index was not asked for them.
    */
-  humanIds?: string[];
-  mouseIds?: string[];
+  humanIds?: number[];
+  mouseIds?: number[];
 }
 
 export const NO_OFF_TARGET_HITS: OffTargetHits = { humanGenes: 0, mouseGenes: 0 };
@@ -53,6 +53,11 @@ export function hasOffTargetHits(hits: OffTargetHits | null): boolean {
 /** Source of genome-wide 22-mer match data. */
 export interface OffTargetIndex {
   lookup(guides: string[]): Promise<Map<string, OffTargetHits>>;
+  /**
+   * Optional second pass filling in Entrez IDs. Separate from `lookup` because counts
+   * are needed for every candidate while identities are only needed for the few shown.
+   */
+  annotate?(hits: Map<string, OffTargetHits>): Promise<void>;
 }
 
 export interface DesignOptions {
@@ -218,6 +223,13 @@ export async function designGuides(
   }
 
   const guides = ranked.slice(0, opts.predictionsPerGene);
+
+  // Name the off-target genes, but only for the handful being returned.
+  if (offTargetIndex?.annotate) {
+    const shown = new Map<string, OffTargetHits>();
+    for (const g of guides) if (g.offTarget) shown.set(g.guide, g.offTarget);
+    if (shown.size > 0) await offTargetIndex.annotate(shown);
+  }
 
   if (guides.length > 0 && guides[0].splash < SCORE_WARNING_THRESHOLD) {
     warnings.push(

@@ -24,6 +24,8 @@ const COLUMNS = [
   "Warnings",
   "Human.22mer.match.gene.count",
   "Mouse.22mer.match.gene.count",
+  "Human.match.entrezIDs",
+  "Mouse.match.entrezIDs",
 ];
 
 /** "" when no off-target index was consulted, so blank is distinct from a real zero. */
@@ -47,7 +49,7 @@ export function toCsv(results: DesignResult[], generatedAt = new Date()): string
 
   for (const result of results) {
     if (result.guides.length === 0) {
-      rows.push([result.label, "no predictions", "", "", "", "", "", "", result.warnings.join("; ")]);
+      rows.push([result.label, "no predictions", "", "", "", "", "", "", result.warnings.join("; "), "", "", "", ""]);
       continue;
     }
     result.guides.forEach((guide, i) => {
@@ -63,6 +65,8 @@ export function toCsv(results: DesignResult[], generatedAt = new Date()): string
         [...guide.warnings, ...(i === 0 ? result.warnings : [])].join("; "),
         offTargetCell(guide.offTarget?.humanGenes),
         offTargetCell(guide.offTarget?.mouseGenes),
+        (guide.offTarget?.humanIds ?? []).join(";"),
+        (guide.offTarget?.mouseIds ?? []).join(";"),
       ]);
     });
   }

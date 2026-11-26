@@ -139,7 +139,10 @@ The outputs are committed, so you only need to rerun these if the source tables 
 
 **Off-target filtering** drops guides whose 22-mer exactly matches a second gene, in
 human (hg38) or mouse (mm10). 2.1 M keys in 9.7 MB, as blocks of 1024; a lookup is an
-in-memory binary search plus one ~4 KB ranged request.
+in-memory binary search plus one ~4 KB ranged request. A further 13 MB holds the
+matching Entrez IDs, fetched only for the handful of guides actually shown — a key's
+slice is found by running the counts forward from its block, so no per-key offset table
+is needed.
 
 **Gene lookup** resolves an Entrez ID to the intersection of that gene's RefSeq
 isoforms — the stretch common to all of them — which is what the original designed
@@ -226,13 +229,17 @@ required at all is a licensing question, not a technical one.
 The collected addresses stay on the legacy host. They are not archived and not in
 either repository.
 
-## Not yet carried over
+## Feature parity
 
-* Gene *names* for off-target hits. The index says how many genes a guide matches, not
-  which; the name lists would roughly triple its size.
-* The `/help`, `/contact` and `/cite` pages.
+Everything the 2017 server did, this does, with two deliberate differences:
 
-See [docs/ROADMAP.md](docs/ROADMAP.md).
+* **Species labels are corrected.** The original swapped its human and mouse off-target
+  tables, so archived CSVs from it have those two columns the wrong way round.
+* **The academic-use attestation is not recorded.** The original logged every address;
+  a static site has nowhere to write one. See *Academic use* above.
+
+`tests/feature-audit.test.ts` asserts that every option visibly changes the output, so
+nothing can quietly become decoration. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Privacy
 

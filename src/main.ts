@@ -319,12 +319,31 @@ function renderResults(results: DesignResult[]): void {
         if (guide.offTarget === null) {
           add("—");
         } else {
-          const { humanGenes, mouseGenes } = guide.offTarget;
-          add(
-            humanGenes + mouseGenes === 0
-              ? "unique"
-              : `${humanGenes} human / ${mouseGenes} mouse`,
-          );
+          const { humanGenes, mouseGenes, humanIds, mouseIds } = guide.offTarget;
+          if (humanGenes + mouseGenes === 0) {
+            add("unique");
+          } else {
+            const cell = document.createElement("td");
+            cell.append(`${humanGenes} human / ${mouseGenes} mouse`);
+            const ids = [...(humanIds ?? []), ...(mouseIds ?? [])];
+            if (ids.length > 0) {
+              const list = document.createElement("div");
+              list.className = "offtarget-genes";
+              // Cap the visible list; a 22-mer can hit over a hundred genes.
+              ids.slice(0, 6).forEach((id, i) => {
+                if (i > 0) list.append(" ");
+                const a = document.createElement("a");
+                a.href = `https://www.ncbi.nlm.nih.gov/gene/${id}`;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.textContent = String(id);
+                list.append(a);
+              });
+              if (ids.length > 6) list.append(` +${ids.length - 6}`);
+              cell.append(list);
+            }
+            cells.push(cell);
+          }
         }
 
         const construct = document.createElement("td");
