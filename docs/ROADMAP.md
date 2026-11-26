@@ -19,9 +19,8 @@ database behind an API.
 | `reference_20151217.pickle` | 22 MB | Isoform coordinates for the gene diagram |
 | `predictions/` | 424 MB | Precomputed top-10 per gene (a cache, not required) |
 
-These originally lived only on the old host under
-`plvsplashrna1-copy/thankamv/softwares/splashrna/server/server/dat/`. They are now
-archived, gzipped and checksummed, in
+These originally lived only in the `dat/` directory of the legacy server's install,
+on a single internal host. They are now archived, gzipped and checksummed, in
 [inodb/splashrna-v2-data](https://github.com/inodb/splashrna-v2-data) (private, 127 MB)
 — the eight files that matter, minus the regenerable `predictions/` cache.
 
