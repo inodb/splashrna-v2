@@ -85,8 +85,8 @@ probably not worth carrying over.
 * **Web Worker.** Scoring is fast enough to stay on the main thread, but moving it off
   would keep the UI perfectly responsive on very long transcripts.
 * **CDS-only option.** Needs the CDS intersection table; same mechanism as above.
-* **Gene diagram.** The original drew shRNA positions along the transcript. Worth
-  rebuilding as inline SVG once isoform coordinates are available.
+* **Gene diagram — done.** Inline SVG, built from the 2015 isoform annotations; see
+  tools/build_annotations.py and src/ui/diagram.ts.
 * **Isoform picker.** When a gene has several transcripts, let the user choose rather
   than defaulting to the first.
 

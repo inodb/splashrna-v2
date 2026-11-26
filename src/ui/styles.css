@@ -350,3 +350,98 @@ footer a {
     padding: 6px;
   }
 }
+
+/* --- transcript diagram ------------------------------------------------------------ */
+
+.diagram-figure {
+  margin: 16px 0 0;
+  overflow-x: auto;
+}
+
+.diagram {
+  display: block;
+  min-width: 560px;
+}
+
+.diagram-label {
+  font-size: 10px;
+  fill: var(--muted);
+  font-family: var(--mono);
+}
+
+.diagram-label-strong {
+  fill: var(--text);
+  font-family: var(--sans);
+  font-weight: 600;
+}
+
+.diagram-intron {
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+
+.diagram-cds {
+  fill: #2d6ca2;
+}
+
+.diagram-utr {
+  fill: #9ecae1;
+}
+
+.diagram-arrow {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+}
+
+.diagram-intersection {
+  fill: var(--good);
+}
+
+.diagram-guide {
+  stroke: #d9480f;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.diagram-axis {
+  stroke: var(--border);
+}
+
+.diagram-tick {
+  font-size: 10px;
+  fill: var(--muted);
+}
+
+.diagram-figure figcaption {
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding-top: 6px;
+}
+
+.key {
+  display: inline-block;
+  width: 11px;
+  height: 9px;
+  border-radius: 2px;
+  vertical-align: -1px;
+  margin: 0 3px 0 10px;
+}
+
+.key:first-child {
+  margin-left: 0;
+}
+
+.key-cds { background: #2d6ca2; }
+.key-utr { background: #9ecae1; }
+.key-int { background: var(--good); }
+.key-guide { background: #d9480f; width: 3px; }
+
+@media (prefers-color-scheme: dark) {
+  .diagram-cds { fill: #5b9bd5; }
+  .diagram-utr { fill: #3a6b8f; }
+  .diagram-guide { stroke: #ff922b; }
+  .key-cds { background: #5b9bd5; }
+  .key-utr { background: #3a6b8f; }
+  .key-guide { background: #ff922b; }
+}

@@ -1,0 +1,485 @@
+{
+ "note": "Genomic positions the 2017 server reported for each guide, used to verify the transcript-offset to genomic-coordinate mapping that places shRNA ticks on the diagram.",
+ "cases": [
+  {
+   "entrezId": 1,
+   "offset": 1679,
+   "genomic": 58346892,
+   "guide": "TTCACATTTATTAATTCCTGGG"
+  },
+  {
+   "entrezId": 1,
+   "offset": 1678,
+   "genomic": 58346893,
+   "guide": "TCACATTTATTAATTCCTGGGA"
+  },
+  {
+   "entrezId": 1,
+   "offset": 903,
+   "genomic": 58351459,
+   "guide": "TTTGGTTGTCATGCAGCCGGTA"
+  },
+  {
+   "entrezId": 1,
+   "offset": 841,
+   "genomic": 58351521,
+   "guide": "TTCAGGTGAAAGAAGATGCGAT"
+  },
+  {
+   "entrezId": 1,
+   "offset": 229,
+   "genomic": 58353100,
+   "guide": "TTCTTGAACAGCTGGAAGTCTG"
+  },
+  {
+   "entrezId": 1,
+   "offset": 226,
+   "genomic": 58353103,
+   "guide": "TTGAACAGCTGGAAGTCTGGAG"
+  },
+  {
+   "entrezId": 1,
+   "offset": 110,
+   "genomic": 58353313,
+   "guide": "TATGGCTGCTTCTGTCACTGGG"
+  },
+  {
+   "entrezId": 1,
+   "offset": 902,
+   "genomic": 58351460,
+   "guide": "TTGGTTGTCATGCAGCCGGTAG"
+  },
+  {
+   "entrezId": 1,
+   "offset": 835,
+   "genomic": 58351527,
+   "guide": "TGAAAGAAGATGCGATCTGGGC"
+  },
+  {
+   "entrezId": 1,
+   "offset": 646,
+   "genomic": 58352311,
+   "guide": "TCAATGGTCACAGTAGCGCTGG"
+  },
+  {
+   "entrezId": 10,
+   "offset": 825,
+   "genomic": 18400722,
+   "guide": "TATAATTGAATTTTCTATAGGT"
+  },
+  {
+   "entrezId": 10,
+   "offset": 605,
+   "genomic": 18400502,
+   "guide": "TTTGTTTGTAATATACTGCTCT"
+  },
+  {
+   "entrezId": 10,
+   "offset": 820,
+   "genomic": 18400717,
+   "guide": "TTGAATTTTCTATAGGTGAGGA"
+  },
+  {
+   "entrezId": 10,
+   "offset": 826,
+   "genomic": 18400723,
+   "guide": "TTATAATTGAATTTTCTATAGG"
+  },
+  {
+   "entrezId": 10,
+   "offset": 313,
+   "genomic": 18400210,
+   "guide": "TACAGAAGTTGATTGACCTGGA"
+  },
+  {
+   "entrezId": 10,
+   "offset": 741,
+   "genomic": 18400638,
+   "guide": "TTATAAATGAAGATGTTGGAGA"
+  },
+  {
+   "entrezId": 10,
+   "offset": 616,
+   "genomic": 18400513,
+   "guide": "TTAAGAAATTCTTTGTTTGTAA"
+  },
+  {
+   "entrezId": 10,
+   "offset": 900,
+   "genomic": 18400797,
+   "guide": "TAAATATATTTCTCAGCACTTC"
+  },
+  {
+   "entrezId": 10,
+   "offset": 901,
+   "genomic": 18400798,
+   "guide": "TTAAATATATTTCTCAGCACTT"
+  },
+  {
+   "entrezId": 10,
+   "offset": 110,
+   "genomic": 18400007,
+   "guide": "TTCAAAATATGCTTCAATGTCC"
+  },
+  {
+   "entrezId": 207,
+   "offset": 2479,
+   "genomic": 104769383,
+   "guide": "TTTATTGAAGAATTTGGAGGGA"
+  },
+  {
+   "entrezId": 207,
+   "offset": 2478,
+   "genomic": 104769384,
+   "guide": "TTATTGAAGAATTTGGAGGGAA"
+  },
+  {
+   "entrezId": 207,
+   "offset": 2480,
+   "genomic": 104769382,
+   "guide": "TTTTATTGAAGAATTTGGAGGG"
+  },
+  {
+   "entrezId": 207,
+   "offset": 2444,
+   "genomic": 104769418,
+   "guide": "TATTATAATAGTAAAAATACTA"
+  },
+  {
+   "entrezId": 207,
+   "offset": 1573,
+   "genomic": 104770289,
+   "guide": "TAAATACAGATCATGGCACGAG"
+  },
+  {
+   "entrezId": 207,
+   "offset": 1574,
+   "genomic": 104770288,
+   "guide": "TTAAATACAGATCATGGCACGA"
+  },
+  {
+   "entrezId": 207,
+   "offset": 2416,
+   "genomic": 104769446,
+   "guide": "AATGTTGTAAAAAAACGCCGTG"
+  },
+  {
+   "entrezId": 207,
+   "offset": 2149,
+   "genomic": 104769713,
+   "guide": "TTGAACAACATAATACACAATA"
+  },
+  {
+   "entrezId": 207,
+   "offset": 933,
+   "genomic": 104773353,
+   "guide": "TCTGTGATCTTAATGTGCCCGT"
+  },
+  {
+   "entrezId": 207,
+   "offset": 2150,
+   "genomic": 104769712,
+   "guide": "TTTGAACAACATAATACACAAT"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 1938,
+   "genomic": 127741007,
+   "guide": "TTTGAAACAAGTTCATAGGTGA"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 2006,
+   "genomic": 127741075,
+   "guide": "TTACATTATGGCTAAATCTTTC"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 2047,
+   "genomic": 127741116,
+   "guide": "TAAAAAAGTTCTTTTATGCCCA"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 1939,
+   "genomic": 127741008,
+   "guide": "ATTTGAAACAAGTTCATAGGTG"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 2092,
+   "genomic": 127741161,
+   "guide": "TTCTTAAATACAAATCTGTTAA"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 2073,
+   "genomic": 127741142,
+   "guide": "TAAAGAAAAAAAAAAGATGGTA"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 2150,
+   "genomic": 127741219,
+   "guide": "TTTAATGGCAATATTTACAGAG"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 927,
+   "genomic": 127738620,
+   "guide": "TTTGATGAAGGTCTCGTCGTCC"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 1740,
+   "genomic": 127740809,
+   "guide": "TTTAAGGATAACTACCTTGGGG"
+  },
+  {
+   "entrezId": 4609,
+   "offset": 1838,
+   "genomic": 127740907,
+   "guide": "TTGTGTTTCAACTGTTCTCGTC"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 2084,
+   "genomic": 87965359,
+   "guide": "TTCATTGTCACTAACATCTGGT"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 1169,
+   "genomic": 87894084,
+   "guide": "TACATCATCAATATTGTTCCTG"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 1573,
+   "genomic": 87952213,
+   "guide": "ATAGTTTCAAACATCATCTTGT"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 1271,
+   "genomic": 87933045,
+   "guide": "TTTGATAAGTTCTAGCTGTGGT"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 1931,
+   "genomic": 87961038,
+   "guide": "TTTTGTTAAAGTAAGTACTAGA"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 1727,
+   "genomic": 87957960,
+   "guide": "TTTGATATCACCACACACAGGT"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 1932,
+   "genomic": 87961039,
+   "guide": "TTTTTGTTAAAGTAAGTACTAG"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 2147,
+   "genomic": 87965422,
+   "guide": "TTCATCAAAAGGTTCATTCTCT"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 1925,
+   "genomic": 87961032,
+   "guide": "TAAAGTAAGTACTAGATATTCC"
+  },
+  {
+   "entrezId": 5728,
+   "offset": 1557,
+   "genomic": 87952197,
+   "guide": "TCTTGTGAAACAACAGTGCCAC"
+  },
+  {
+   "entrezId": 672,
+   "offset": 655,
+   "genomic": 43094840,
+   "guide": "TTCAGTATTTGTTACATCCGTC"
+  },
+  {
+   "entrezId": 672,
+   "offset": 1702,
+   "genomic": 43067632,
+   "guide": "TTTCATAACAACATGAGTAGTC"
+  },
+  {
+   "entrezId": 672,
+   "offset": 2712,
+   "genomic": 43045136,
+   "guide": "TTTCATTTCTAATACCTGCCTC"
+  },
+  {
+   "entrezId": 672,
+   "offset": 1194,
+   "genomic": 43074464,
+   "guide": "TTTCTATTCTGAAGACTCCCAG"
+  },
+  {
+   "entrezId": 672,
+   "offset": 3242,
+   "genomic": 43044606,
+   "guide": "TAGATATGAAATATTCATGCCA"
+  },
+  {
+   "entrezId": 672,
+   "offset": 1093,
+   "genomic": 43076531,
+   "guide": "TTTACTGGTAGAACTATCTGCA"
+  },
+  {
+   "entrezId": 672,
+   "offset": 2554,
+   "genomic": 43045294,
+   "guide": "TTTAGAGAAGTAAACTTAGGGA"
+  },
+  {
+   "entrezId": 672,
+   "offset": 2629,
+   "genomic": 43045219,
+   "guide": "TTAAGTCACATAATCGATCCCA"
+  },
+  {
+   "entrezId": 672,
+   "offset": 2279,
+   "genomic": 43045569,
+   "guide": "TACATAAAATATTTAGTAGCCA"
+  },
+  {
+   "entrezId": 672,
+   "offset": 2445,
+   "genomic": 43045403,
+   "guide": "TAATGAATCAGCATCTTGCTCA"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5684,
+   "genomic": 12037104,
+   "guide": "TTGAATTTATATTACATACCAC"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5860,
+   "genomic": 12036928,
+   "guide": "TTAGTTTTCAATATTTTACAGA"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 4255,
+   "genomic": 12046923,
+   "guide": "TCTTATTGACAATAAGTCTCCG"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5788,
+   "genomic": 12037000,
+   "guide": "TTAAACATATAAACAATCCGGT"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5233,
+   "genomic": 12037555,
+   "guide": "TTTCTTTACAGAAATTGTTGTA"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5679,
+   "genomic": 12037109,
+   "guide": "TTTATATTACATACCACTGGAT"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5714,
+   "genomic": 12037074,
+   "guide": "TTACAATTAGTTGTTGTGTGTG"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5252,
+   "genomic": 12037536,
+   "guide": "TTCATATGTAATAGTGTCCTTT"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5685,
+   "genomic": 12037103,
+   "guide": "TTTGAATTTATATTACATACCA"
+  },
+  {
+   "entrezId": 71458,
+   "offset": 5680,
+   "genomic": 12037108,
+   "guide": "ATTTATATTACATACCACTGGA"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1013,
+   "genomic": 7669402,
+   "guide": "TTAAAATCTAAGCTGGTATGTC"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1961,
+   "genomic": 7668454,
+   "guide": "TTATTGTAAAATAAGAGATCGA"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1960,
+   "genomic": 7668455,
+   "guide": "TATTGTAAAATAAGAGATCGAT"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1962,
+   "genomic": 7668453,
+   "guide": "TTTATTGTAAAATAAGAGATCG"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 320,
+   "genomic": 7674267,
+   "guide": "TTACACATGTAGTTGTAGTGGA"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1963,
+   "genomic": 7668452,
+   "guide": "TTTTATTGTAAAATAAGAGATC"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1485,
+   "genomic": 7668930,
+   "guide": "TATACAAGAGATGAAATCCTCC"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1237,
+   "genomic": 7669178,
+   "guide": "TACATTATTTCATTAACCCTCA"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1066,
+   "genomic": 7669349,
+   "guide": "TTAACTGCAAGAACATTTCTTA"
+  },
+  {
+   "entrezId": 7157,
+   "offset": 1157,
+   "genomic": 7669258,
+   "guide": "TTAGAGAAAATTCAACAGTGAG"
+  }
+ ]
+}

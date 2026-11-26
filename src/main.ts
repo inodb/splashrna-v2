@@ -2,11 +2,16 @@
 
 import { fetchGeneTranscripts, fetchRefSeq } from "./data/ncbi.js";
 import {
+  StaticAnnotationIndex,
+  transcriptCoordinates,
+} from "./data/annotations.js";
+import {
   DEFAULT_TRANSCRIPT_OPTIONS,
   StaticGeneIndex,
   selectTranscript,
   type TranscriptOptions,
 } from "./data/genes.js";
+import { renderDiagram, type DiagramGuide } from "./ui/diagram.js";
 import { StaticOffTargetIndex } from "./data/offtarget.js";
 import type { OffTargetIndex } from "./engine/design.js";
 import {
@@ -65,6 +70,25 @@ async function getOffTargetIndex(): Promise<OffTargetIndex | null> {
   return offTarget;
 }
 
+/**
+ * Annotations for the transcript diagram. Loaded on first use only — a session that
+ * never designs against a gene ID never pays for it.
+ */
+let annotations: StaticAnnotationIndex | null | undefined;
+
+async function getAnnotationIndex(): Promise<StaticAnnotationIndex | null> {
+  if (annotations !== undefined) return annotations;
+  try {
+    annotations = await StaticAnnotationIndex.load("./annotations");
+  } catch {
+    annotations = null;
+  }
+  return annotations;
+}
+
+/** Diagrams built during a run, keyed by the result label they belong to. */
+const diagrams = new Map<string, SVGSVGElement>();
+
 /** Likewise optional: without it, Entrez IDs fall back to a single RefSeq transcript. */
 let geneIndex: StaticGeneIndex | null | undefined;
 
@@ -114,9 +138,17 @@ function readOptions(): DesignOptions {
 }
 
 /** Turn one parsed record into a label and a nucleotide sequence. */
-async function resolveEntry(
-  entry: FastaEntry,
-): Promise<{ label: string; sequence: string; note?: string }> {
+interface ResolvedEntry {
+  label: string;
+  sequence: string;
+  note?: string;
+  /** Set when the sequence came from the gene index, so a diagram can be drawn. */
+  entrezId?: number;
+  /** Guide offsets only map to genomic coordinates for the intersection itself. */
+  mappable?: boolean;
+}
+
+async function resolveEntry(entry: FastaEntry): Promise<ResolvedEntry> {
   switch (entry.kind) {
     case "sequence":
       return { label: entry.label, sequence: entry.value.replace(/\*/g, "") };
@@ -141,6 +173,11 @@ async function resolveEntry(
             label: `${entry.label} (Entrez ${entry.value})`,
             sequence: choice.sequence,
             note: choice.warnings[0],
+            entrezId: intersection.entrezId,
+            // A polyA-trimmed transcript is a prefix of the intersection, so offsets
+            // still line up. The CDS is a different sequence with different
+            // coordinates, which this index does not carry.
+            mappable: choice.source !== "cds",
           };
         }
       }
@@ -264,6 +301,21 @@ function renderResults(results: DesignResult[]): void {
       table.append(body);
       scroll.append(table);
       section.append(scroll);
+
+      const diagram = diagrams.get(result.label);
+      if (diagram) {
+        const figure = document.createElement("figure");
+        figure.className = "diagram-figure";
+        figure.append(diagram);
+        const caption = document.createElement("figcaption");
+        caption.innerHTML =
+          '<span class="key key-cds"></span> coding ' +
+          '<span class="key key-utr"></span> UTR ' +
+          '<span class="key key-int"></span> designed region ' +
+          '<span class="key key-guide"></span> shRNA';
+        figure.append(caption);
+        section.append(figure);
+      }
     }
 
     els.results.append(section);
@@ -280,6 +332,7 @@ async function run(): Promise<void> {
   els.run.disabled = true;
   els.csv.disabled = true;
   els.results.replaceChildren();
+  diagrams.clear();
   els.progress.hidden = false;
   els.progress.value = 0;
 
@@ -294,7 +347,8 @@ async function run(): Promise<void> {
     const results: DesignResult[] = [];
 
     for (const [idx, entry] of entries.entries()) {
-      const { label, sequence, note } = await resolveEntry(entry);
+      const resolved = await resolveEntry(entry);
+      const { label, sequence, note } = resolved;
       setStatus(`Scoring ${label} (${idx + 1} of ${entries.length})…`);
 
       const result = await designGuides(
@@ -307,6 +361,27 @@ async function run(): Promise<void> {
         },
       );
       if (note) result.warnings.unshift(note);
+
+      // Draw the transcript diagram when we know which gene this was.
+      if (resolved.entrezId !== undefined) {
+        const index = await getAnnotationIndex();
+        const annotation = index ? await index.get(resolved.entrezId) : null;
+        if (annotation) {
+          const coordinates = resolved.mappable
+            ? transcriptCoordinates(annotation.intersection, annotation.strand)
+            : [];
+          const marks: DiagramGuide[] = result.guides
+            .map((g) => ({
+              position: g.position,
+              genomic: coordinates[g.position] ?? NaN,
+              guide: g.guide,
+              splash: g.splash,
+            }))
+            .filter((g) => Number.isFinite(g.genomic));
+          const svg = renderDiagram(annotation, marks);
+          if (svg) diagrams.set(label, svg);
+        }
+      }
       if (missingIndex) {
         result.warnings.push(
           "Off-target filtering was skipped — that data is not available here, so these guides may also hit other human or mouse genes.",

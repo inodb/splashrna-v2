@@ -1,0 +1,15 @@
+{
+  "formatVersion": 1,
+  "note": "Isoform exon structures and intersection ranges, in the legacy encoding, for the transcript diagram. These are the 2015 annotations the predictions were computed against, not current RefSeq.",
+  "source": [
+    "reference_20151217.pickle",
+    "intersection_20151217_updated.txt"
+  ],
+  "count": 39846,
+  "withBoth": 39843,
+  "blobBytes": 28812805,
+  "indexBytes": 796920,
+  "recordBytes": 20,
+  "blob": "annotations.bin",
+  "index": "annotations.idx"
+}

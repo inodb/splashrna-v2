@@ -184,11 +184,35 @@ public/          model bundle and the built indexes, served as-is
 The engine has **zero runtime dependencies**. Everything in `package.json` is a dev
 tool.
 
+## The transcript diagram
+
+Each gene result is drawn as inline SVG: one lane per RefSeq isoform with CDS and UTR
+blocks, the isoform intersection that was actually designed against, and a tick at the
+genomic position of every predicted shRNA.
+
+```bash
+python3 tools/build_annotations.py /path/to/dat public/annotations
+```
+
+28.8 MB of 2015 annotations with a 0.8 MB index, loaded only when a diagram is first
+opened; a gene costs one ~700-byte range request.
+
+**Why not embed igv.js or JBrowse 2**, both of which run without a backend and can load
+hosted hg38 RefSeq tracks? Three reasons. Those tracks carry *current* RefSeq, but the
+predictions were computed against the 2015 annotation, so the picture could disagree
+with the numbers beside it. Hosted annotation files go down — the IGV forum has reports
+of exactly that. And sending the genes a user is looking at to a third-party host would
+quietly undo the privacy the rest of the site keeps.
+
+Guide ticks are placed by mapping each transcript offset back to a genomic coordinate;
+`tests/annotations.test.ts` checks all 80 of those against the positions the 2017
+server printed, on both strands.
+
 ## Not yet carried over
 
 * Gene *names* for off-target hits. The index says how many genes a guide matches, not
   which; the name lists would roughly triple its size.
-* The transcript diagram, and the `/help`, `/contact` and `/cite` pages.
+* The `/help`, `/contact` and `/cite` pages.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md).
 
