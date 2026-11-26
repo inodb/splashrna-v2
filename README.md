@@ -131,6 +131,10 @@ the site works and says so in the results; with it, filtering activates automati
 python3 tools/build_offtarget.py /path/to/legacy/dat public/offtarget
 ```
 
+The source tables are archived in
+[inodb/splashrna-v2-data](https://github.com/inodb/splashrna-v2-data) (private); that
+repo's README has the one-liner to unpack them.
+
 That reads the legacy 22-mer match tables and produces a 9.7 MB block-structured index
 (8.2 MB gzipped). Only the 21 KB block directories are fetched up front; individual
 lookups pull a single ~4 KB block with an HTTP Range request, and a query that would
@@ -154,6 +158,8 @@ as a static index:
 ```bash
 python3 tools/build_genes.py /path/to/legacy/dat public/genes
 ```
+
+Same source archive as above: [inodb/splashrna-v2-data](https://github.com/inodb/splashrna-v2-data).
 
 39,760 genes packed 4 bits per symbol into a 58 MB blob, with a 636 KB index. Only the
 index is downloaded; a gene costs one Range request of a few kilobytes, so the blob's
